@@ -561,7 +561,7 @@ async function syncNow(){
 }
 function syncLabel(){
   if(!SY.cfg)return '';
-  return {syncing:'同步中…',ok:'已同步',offline:'離線中，有網路時會自動同步',error:'同步失敗，稍後會再試',badkey:'通行碼不對，請重新設定',off:''}[SY.status]||'';
+  return {syncing:'同步中…',ok:'已同步',offline:'離線中，有網路時會自動同步',error:'同步失敗，稍後會再試',badkey:'同步網址需要重新設定',off:''}[SY.status]||'';
 }
 function paintSync(){
   const el=document.getElementById('syncchip');if(el){el.textContent=syncLabel();el.className='syncchip s-'+SY.status;el.hidden=!SY.cfg;}
@@ -584,9 +584,8 @@ function parseSyncCode(raw,key){
 async function connectSync(raw,key){
   const c=parseSyncCode(raw,key);
   if(!/^https:\/\/script\.google\.com\/.+\/exec$/.test(c.url))throw Object.assign(new Error(),{msg:'同步網址不對，應該是 https://script.google.com/ 開頭、/exec 結尾。'});
-  if(!c.key)throw Object.assign(new Error(),{msg:'請填通行碼。'});
-  const prev=SY.cfg;SY.cfg={url:c.url,key:c.key,first:true};
-  try{await api('ping');}catch(e){SY.cfg=prev;throw Object.assign(new Error(),{msg:e.code==='key'?'通行碼不對，請再確認一次。':'連不到同步網址，請確認網址和網路。'});}
+  const prev=SY.cfg;SY.cfg={url:c.url,key:c.key||'',first:true};
+  try{await api('ping');}catch(e){SY.cfg=prev;throw Object.assign(new Error(),{msg:e.code==='key'?'這個同步網址還在用舊版程式。請到 Apps Script 重新執行 setup，再部署新版本。':'連不到同步網址。請確認網址正確，而且部署時「誰可以存取」選的是「所有人」。'});}
   SY.first=true;SY.meta={};await LDB.put('docs','meta/sync',SY.cfg);saveMeta();
   await syncNow();
 }
@@ -651,8 +650,8 @@ function syncCard(){
     <div class="tools"><button class="btn sun" data-act="openSync">開啟同步</button></div></section>`;
   return `<section class="card bk"><h3>${catIcon('行前',2)}家人同步</h3>
     <p id="syncstate">${syncDetail()}</p>
-    <p>要讓家人一起用：在他的手機打開露營手帳 →「紀錄」→「開啟同步」，貼上這個同步碼。</p>
-    <div class="tools"><button class="btn sun" data-act="copyFamily">複製給家人的同步碼</button><button class="btn" data-act="syncNow">立即同步</button>
+    <p>要讓家人一起用：在他的手機打開露營手帳 →「紀錄」→「開啟同步」，貼上同步網址。這串網址就是鑰匙，只傳給家人。</p>
+    <div class="tools"><button class="btn sun" data-act="copyFamily">複製給家人的同步網址</button><button class="btn" data-act="syncNow">立即同步</button>
     <button class="btn ${S.confirm==='unsync'?'danger':'ghost'}" data-act="unsync">${S.confirm==='unsync'?'確定關閉這支手機的同步？':'關閉同步'}</button></div></section>`;
 }
 function backupCard(){
@@ -906,9 +905,8 @@ function refreshSheet(){
     const f=sheetState;
     el.innerHTML=`<div class="sheet-bar"><button class="btn ghost" data-act="close">取消</button><h3>開啟同步</h3><span style="width:64px"></span></div>
     <form class="sheet-body" autocomplete="off" onsubmit="return false">
-      <p class="hint">第一次設定：填 Google Apps Script 部署後的「網頁應用程式網址」和試算表「設定」頁的通行碼。<br>家人加入：把你複製的同步碼整串貼在第一格，通行碼留空就好。</p>
-      <div class="field"><label for="s-url">同步網址（或同步碼）</label><textarea id="s-url" style="min-height:90px;font-size:14px" placeholder="https://script.google.com/macros/s/……/exec">${esc(f.url||'')}</textarea></div>
-      <div class="field"><label for="s-key">通行碼</label><input id="s-key" value="${esc(f.key||'')}" placeholder="家人用同步碼的話可以留空"></div>
+      <p class="hint">貼上 Google Apps Script 部署後的「網頁應用程式網址」。家人加入時，貼上你傳給他的同步網址就好。</p>
+      <div class="field"><label for="s-url">同步網址</label><textarea id="s-url" style="min-height:100px;font-size:14px" placeholder="https://script.google.com/macros/s/……/exec">${esc(f.url||'')}</textarea></div>
       ${f.err?`<div class="banner">${esc(f.err)}</div>`:''}
       <button type="button" class="btn sun newtrip" data-act="doConnect" ${f.busy?'disabled':''}>${f.busy?'連線中…':'連線'}</button>
       <p class="hint">連線後，如果雲端已經有資料（例如家人先設定好了），這支手機會改成顯示雲端那一份。</p>
@@ -1061,11 +1059,11 @@ document.addEventListener('click',async e=>{
     case 'rmPhoto':{readForm();const f=sheetState.form;const id=f.photos.splice(+b.dataset.k,1)[0];f.removed.push(id);refreshSheet();break;}
     case 'saveTrip': saveTrip();break;
     case 'openSync': openSheet({kind:'sync'});break;
-    case 'doConnect':{const f=sheetState;f.url=$('#s-url').value;f.key=$('#s-key').value;f.busy=true;f.err='';refreshSheet();
+    case 'doConnect':{const f=sheetState;f.url=$('#s-url').value;f.key='';f.busy=true;f.err='';refreshSheet();
       try{await connectSync(f.url,f.key);closeSheet();render();toast('已開啟同步');}
       catch(err){f.busy=false;f.err=err.msg||'連線失敗，請再試一次';refreshSheet();}
       break;}
-    case 'copyFamily':{const t=SY.cfg.url+'#'+SY.cfg.key;try{await navigator.clipboard.writeText(t);toast('已複製，用 LINE 傳給家人');}catch(err){openSheet({kind:'copy',text:t});}break;}
+    case 'copyFamily':{const t=SY.cfg.key?SY.cfg.url+'#'+SY.cfg.key:SY.cfg.url;try{await navigator.clipboard.writeText(t);toast('已複製，用 LINE 傳給家人');}catch(err){openSheet({kind:'copy',text:t});}break;}
     case 'syncNow': syncNow();break;
     case 'unsync':
       if(S.confirm!=='unsync'){setConfirm('unsync');render();return;}
