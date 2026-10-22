@@ -60,6 +60,8 @@
 body{margin:0}
 img{max-width:100%}
 [hidden]{display:none!important}
+.syncchip{display:inline-block;vertical-align:top;font-size:11px;border-radius:999px;padding:2px 9px;margin-left:4px;background:var(--surface);color:var(--muted);box-shadow:0 2px 0 var(--shadow);letter-spacing:.02em}
+.syncchip.s-ok{color:var(--grass-deep)}.syncchip.s-error,.syncchip.s-badkey{color:var(--heart)}
 .bk{margin-top:26px;padding:16px;display:grid;gap:10px}
 .bk h3{margin:0;font-family:var(--f-display);font-weight:400;font-size:18px;display:flex;align-items:center;gap:8px}
 .bk p{margin:0;font-size:13px;color:var(--muted)}
@@ -417,7 +419,7 @@ function findItem(cid,iid){const c=S.gear.categories.find(c=>c.id===cid);return 
 const SEED_GEAR={"categories": [{"id": "c11", "items": [{"id": "n1", "must": true, "name": "查天氣（下雨、低溫、風）", "packed": false}, {"id": "n2", "must": true, "name": "確認營位與訂金", "packed": false, "skip": false}, {"id": "n3", "name": "跟營主確認入場時間", "packed": false}, {"id": "n4", "must": true, "name": "行動電源、頭燈先充電", "packed": false}, {"id": "n5", "name": "買冰塊", "packed": false}, {"id": "n6", "name": "帶現金（營地費、小吃）", "packed": false}], "name": "行前確認"}, {"id": "c1", "items": [{"id": "i1", "must": true, "name": "動力線兩條＋備用延長線", "packed": false}, {"id": "i2", "must": true, "name": "帳篷（含營柱、營繩、青蛙燈）", "packed": false}, {"id": "i3", "must": true, "name": "鐵鎚（含營釘）", "packed": false}, {"id": "i4", "name": "麻布手套兩雙", "packed": false}, {"id": "i5", "name": "小天幕與天幕營柱", "packed": false}, {"id": "i6", "must": true, "name": "頭燈、頭燈充電器", "packed": false}, {"id": "i7", "must": true, "name": "燈（飛碟燈、N9燈、燈架）", "packed": false}, {"id": "m1", "name": "露營燈（ML4／ML6）", "packed": false}, {"id": "m2", "name": "燈條", "packed": false}, {"id": "m3", "name": "噴燈", "packed": false}, {"id": "m4", "name": "木頭", "packed": false}, {"id": "m5", "name": "夾木頭的鐵夾", "packed": false}], "name": "營具"}, {"id": "c15", "items": [{"id": "n26", "must": true, "name": "行動電源（大台）", "packed": false}, {"id": "m16", "must": true, "name": "充電包、手機充電線（Type-C）", "packed": false}, {"id": "m17", "name": "電風扇＋B5 電池", "packed": false, "season": "summer"}], "name": "電力設備"}, {"id": "c2", "items": [{"id": "i8", "must": true, "name": "KZM 綠色大桌", "packed": false}, {"id": "i9", "name": "工作椅", "packed": false}, {"id": "i10", "name": "躺椅", "packed": false}, {"id": "i11", "name": "沙發", "packed": false}, {"id": "i12", "name": "旋轉椅＋邊桌 ×2", "packed": false}], "name": "客廳"}, {"id": "c3", "items": [{"id": "i13", "name": "鐵置物架", "packed": false}, {"id": "i14", "name": "摺疊箱 ×4", "packed": false}, {"id": "i15", "name": "軟箱 ×2", "packed": false}, {"id": "i16", "name": "廚房收納架", "packed": false}, {"id": "i17", "name": "RV 桶", "packed": false}, {"id": "m6", "name": "露營推車", "packed": false}], "name": "收納"}, {"id": "c12", "items": [{"id": "n7", "must": true, "name": "卡式爐", "packed": false}, {"id": "n8", "must": true, "name": "瓦斯罐", "packed": false}, {"id": "n9", "must": true, "name": "三合一鍋具", "packed": false}, {"id": "n10", "must": true, "name": "餐具與杯子（大人、小孩）", "packed": false}, {"id": "n11", "must": true, "name": "冰箱／冰桶", "packed": false}, {"id": "n12", "name": "砧板、菜刀", "packed": false}, {"id": "n13", "name": "料理夾、鍋鏟", "packed": false}, {"id": "n15", "must": true, "name": "洗碗精、菜瓜布 ×2", "packed": false}, {"id": "n16", "name": "洗碗盆", "packed": false}, {"id": "n17", "must": true, "name": "垃圾袋", "packed": false}, {"id": "n18", "must": true, "name": "水（3 公升桶）", "packed": false}, {"id": "m7", "name": "擋風板", "packed": false}, {"id": "m8", "name": "媽媽的烤盤", "packed": false}, {"id": "m9", "name": "煮飯用具（網袋那包）", "packed": false}, {"id": "m10", "name": "熱壓鍋", "packed": false}, {"id": "m11", "name": "真空盒＋真空機", "packed": false}, {"id": "m12", "name": "曬碗網子", "packed": false}], "name": "廚房炊具"}, {"id": "c4", "items": [{"id": "i18", "must": true, "name": "行軍床 ×2", "packed": false}, {"id": "i19", "name": "行軍床地墊 ×2", "packed": false}, {"id": "i20", "name": "行軍床床墊 ×2", "packed": false}, {"id": "i21", "name": "捲捲舒枕頭 ×2", "packed": false}, {"id": "i22", "name": "枕頭巾 ×2", "packed": false}, {"id": "i23", "must": true, "name": "睡袋 ×2", "packed": false}, {"id": "i24", "name": "電熱毯用棉被", "packed": false, "season": "winter"}, {"id": "i25", "must": true, "name": "電熱毯（床墊）", "packed": false, "season": "winter"}, {"id": "m13", "name": "棉被", "packed": false}], "name": "寢具"}, {"id": "c5", "items": [{"id": "i26", "must": true, "name": "電暖爐（黑設）", "packed": false, "season": "winter"}, {"id": "i27", "name": "煤油暖爐", "packed": false, "season": "winter", "skip": false}, {"id": "i28", "name": "熱風扇", "packed": false, "season": "winter", "skip": false}, {"id": "i29", "name": "一氧化碳偵測器", "packed": false, "season": "winter", "skip": false}, {"id": "i30", "name": "隔熱板", "packed": false, "season": "winter"}, {"id": "i31", "name": "溫度計", "packed": false}, {"id": "i32", "name": "煤油桶", "packed": false, "season": "winter", "skip": false}, {"id": "i33", "name": "油抽、漏斗", "packed": false, "season": "winter"}], "name": "保暖"}, {"id": "c6", "items": [{"id": "i34", "must": true, "name": "保暖外套＋雨衣", "packed": false}, {"id": "i35", "name": "短袖＋褲子", "packed": false}, {"id": "i36", "must": true, "name": "長袖／長褲", "packed": false}, {"id": "i37", "name": "拖鞋／鞋子", "packed": false}, {"id": "i38", "name": "發熱衣＋發熱褲", "packed": false, "season": "winter"}, {"id": "i39", "name": "圍脖＋毛帽", "packed": false, "season": "winter"}, {"id": "i40", "name": "泳衣（玩水、泡湯）", "packed": false, "season": "summer"}, {"id": "m14", "must": true, "name": "替換衣物（大人 1 套／小孩 2 套）", "packed": false}], "name": "換洗衣物"}, {"id": "c13", "items": [{"id": "n19", "must": true, "name": "兒童藥品（退燒、過敏）", "packed": false}, {"id": "n21", "must": true, "name": "小水壺", "packed": false}, {"id": "n22", "name": "兒童相機", "packed": false}, {"id": "n23", "name": "腳踏車／滑步車", "packed": false}], "name": "小孩用品"}, {"id": "c19", "items": [{"id": "m45", "name": "泡泡機", "packed": false}, {"id": "m46", "name": "球", "packed": false}, {"id": "m47", "name": "玩具", "packed": false}, {"id": "m48", "name": "野餐墊", "packed": false}, {"id": "m49", "name": "小孩帳篷", "packed": false}, {"id": "m50", "name": "空拍機、遙控車", "packed": false}], "name": "娛樂"}, {"id": "c20", "items": [{"id": "m51", "name": "紙板", "packed": false}, {"id": "m52", "name": "奇異筆", "packed": false}, {"id": "m53", "name": "透明膠帶", "packed": false}, {"id": "m54", "name": "雙面膠", "packed": false}], "name": "美勞文具"}, {"id": "c7", "items": [{"id": "i41", "name": "沐浴乳", "packed": false}, {"id": "i42", "name": "洗髮乳", "packed": false}, {"id": "i43", "name": "潤髮", "packed": false}, {"id": "i44", "name": "護髮", "packed": false}, {"id": "i45", "must": true, "name": "牙刷", "packed": false}, {"id": "i46", "must": true, "name": "牙膏", "packed": false}, {"id": "i47", "must": true, "name": "毛巾、浴巾", "packed": false}, {"id": "i48", "name": "洗澡防水袋", "packed": false}], "name": "盥洗用品"}, {"id": "c8", "items": [{"id": "i49", "must": true, "name": "急救藥品", "packed": false}, {"id": "i50", "name": "維他命", "packed": false}, {"id": "i51", "name": "乳液", "packed": false}, {"id": "i52", "name": "護唇膏", "packed": false}], "name": "藥品保養"}, {"id": "c9", "items": [{"id": "i53", "name": "曬衣繩", "packed": false}, {"id": "i54", "name": "掛勾", "packed": false}, {"id": "i55", "name": "衣架", "packed": false}], "name": "生活用品"}, {"id": "c10", "items": [{"id": "i56", "name": "板凳", "packed": false}, {"id": "i57", "name": "防曬乳", "packed": false}, {"id": "i58", "name": "防蚊液", "packed": false}, {"id": "m15", "name": "蚊香", "packed": false}], "name": "其他"}, {"id": "c14", "items": [{"id": "n24", "must": true, "name": "衛生紙", "packed": false}, {"id": "n25", "must": true, "name": "濕紙巾", "packed": false}, {"id": "n27", "name": "地布", "packed": false}, {"id": "n28", "name": "雨具（雨傘、雨鞋）", "packed": false}, {"id": "n29", "name": "焚火台", "packed": false}, {"id": "n30", "name": "打火機", "packed": false}], "name": "雜項"}], "season": "all"};
 const SEED_MENU={"extras": [{"id": "x1", "name": "水果"}, {"id": "x2", "name": "小香腸（煮熱狗用）"}, {"id": "x3", "name": "雞塊"}, {"id": "x4", "name": "金針菇／其他菇類"}, {"id": "x5", "name": "煎餃"}, {"id": "x6", "name": "白飯（電鍋？）"}, {"id": "x7", "name": "草莓果醬"}, {"id": "x8", "name": "胡椒鹽、調味粉"}, {"id": "x9", "name": "醬油"}, {"id": "x10", "name": "油（小罐＋噴油罐）"}, {"id": "x11", "name": "味醂"}], "meals": [{"day": 1, "dish": "味噌豆腐泡麵＋蔬菜", "id": "meal1", "ings": ["味噌", "豆腐", "泡麵", "蔬菜（高麗菜、花椰菜）"], "slot": 2}, {"day": 2, "dish": "吐司加蛋、肉鬆、肉片", "id": "meal2", "ings": ["冷凍吐司／貝果", "蛋（一盒）", "肉鬆、肉片"], "slot": 0}, {"day": 2, "dish": "抓餅", "id": "meal3", "ings": ["抓餅"], "slot": 1}, {"day": 2, "dish": "好市多的鍋（待定）", "id": "meal4", "ings": ["好市多火鍋（待定）"], "slot": 2}, {"day": 3, "dish": "法國吐司（熱壓鍋）＋咖啡", "id": "meal5", "ings": ["冷凍吐司／貝果", "蛋（一盒）", "奶油", "糖", "咖啡／奶茶／可可"], "slot": 0}], "ready": {}};
 
-/* ---------- 本機儲存（IndexedDB，資料只存在這支手機的瀏覽器） ---------- */
+/* ---------- 本機儲存（IndexedDB）＋ Google 同步 ---------- */
 const LDB=(()=>{let p;
   const open=()=>p||(p=new Promise((res,rej)=>{const r=indexedDB.open('camp-notebook',1);
     r.onupgradeneeded=()=>{const d=r.result;if(!d.objectStoreNames.contains('docs'))d.createObjectStore('docs');if(!d.objectStoreNames.contains('photos'))d.createObjectStore('photos');};
@@ -434,35 +436,179 @@ const LDB=(()=>{let p;
   };})();
 const URLS=new Map();
 const newId=()=>Date.now().toString(36)+uid();
+const isDrive=id=>typeof id==='string'&&id.startsWith('d_');
+
+/* 同步狀態：每份資料記住伺服器版本 v、上次同步的內容 b、是否有還沒上傳的修改 dirty */
+const SY={cfg:null,meta:{},busy:false,again:false,status:'off',last:null,timer:null,first:false};
+const docKeys=()=>['gear/main','menu/main',...S.trips.map(t=>'trips/'+t.id)];
+function getLocal(k){
+  if(k==='gear/main')return S.gear;if(k==='menu/main')return S.menu;
+  if(k.startsWith('trips/')){const t=S.trips.find(x=>x.id===k.slice(6));if(!t)return undefined;const c=Object.assign({},t);delete c.id;return c;}
+}
+function setLocal(k,d){
+  if(k==='gear/main'){S.gear=d||{categories:[]};if(!S.gear.categories)S.gear.categories=[];}
+  else if(k==='menu/main'){S.menu=d||{};normMenu();}
+  else if(k.startsWith('trips/')){const id=k.slice(6);S.trips=S.trips.filter(x=>x.id!==id);
+    if(d)S.trips.push(Object.assign({},d,{id}));S.trips.sort((a,b)=>(b.date||'').localeCompare(a.date||''));}
+  (d?LDB.put('docs',k,clone(d)):LDB.del('docs',k)).catch(()=>{});
+}
+let metaT;
+function saveMeta(){clearTimeout(metaT);metaT=setTimeout(()=>LDB.put('docs','meta/syncstate',SY.meta).catch(()=>{}),300);}
+function markDirty(k){const m=SY.meta[k]||(SY.meta[k]={v:0,b:null});m.dirty=true;saveMeta();schedulePush();}
+function schedulePush(){if(!SY.cfg)return;clearTimeout(SY.timer);SY.timer=setTimeout(syncNow,1200);}
+
+/* 兩個人同時修改時，以項目為單位合併：你勾的和他勾的都會留下 */
+const isObj=x=>x&&typeof x==='object'&&!Array.isArray(x);
+const same=(a,b)=>JSON.stringify(a)===JSON.stringify(b);
+function merge3(b,m,t){
+  if(same(m,t))return m;if(same(b,m))return t;if(same(b,t))return m;
+  if(isObj(m)&&isObj(t)){const bo=isObj(b)?b:{},o={};
+    for(const k of new Set([...Object.keys(m),...Object.keys(t)])){const v=merge3(bo[k],m[k],t[k]);if(v!==undefined)o[k]=v;}return o;}
+  if(Array.isArray(m)&&Array.isArray(t)&&[...m,...t].every(x=>isObj(x)&&x.id)){
+    const B=new Map((Array.isArray(b)?b:[]).filter(x=>isObj(x)&&x.id).map(x=>[x.id,x])),M=new Map(m.map(x=>[x.id,x])),T=new Map(t.map(x=>[x.id,x]));
+    const out=[],seen=new Set();
+    const add=id=>{if(seen.has(id))return;seen.add(id);const v=merge3(B.get(id),M.get(id),T.get(id));if(v!==undefined)out.push(v);};
+    t.forEach(x=>add(x.id));m.forEach(x=>add(x.id));return out;}
+  return m;
+}
+
+/* 本機 API：和之前一樣的寫法，存檔後自動排隊同步 */
 const localDb={
   doc:path=>({
-    set:async d=>{await LDB.put('docs',path,clone(d));if(path.startsWith('trips/'))await reloadTrips();},
-    delete:async()=>{await LDB.del('docs',path);if(path.startsWith('trips/'))await reloadTrips();}}),
-  collection:c=>({add:async d=>{const id=newId();await LDB.put('docs',c+'/'+id,clone(d));if(c==='trips')await reloadTrips();return {id};}})
+    set:async d=>{setLocal(path,clone(d));markDirty(path);if(path.startsWith('trips/'))afterTrips();},
+    delete:async()=>{setLocal(path,null);markDirty(path);if(path.startsWith('trips/'))afterTrips();}}),
+  collection:c=>({add:async d=>{const id=newId();const k=c+'/'+id;setLocal(k,clone(d));markDirty(k);afterTrips();return {id};}})
 };
-const localAssets={
-  upload:async b=>{const id=newId();await LDB.put('photos',id,b);URLS.set(id,URL.createObjectURL(b));return {id};},
-  delete:async id=>{await LDB.del('photos',id);const u=URLS.get(id);if(u)URL.revokeObjectURL(u);URLS.delete(id);return {deleted:true};}
-};
-async function reloadTrips(){
-  const all=await LDB.all('docs');
-  S.trips=all.filter(([k])=>k.startsWith('trips/')).map(([k,v])=>Object.assign({},v,{id:k.slice(6)})).sort((a,b)=>(b.date||'').localeCompare(a.date||''));
-  if(S.tab==='trips')render(); if(typeof sheetState!=='undefined'&&sheetState&&sheetState.kind==='detail')refreshSheet();
+function afterTrips(){if(S.tab==='trips')render();if(typeof sheetState!=='undefined'&&sheetState&&sheetState.kind==='detail')refreshSheet();}
+
+async function api(action,payload,timeout){
+  const ctl=new AbortController();const to=setTimeout(()=>ctl.abort(),timeout||25000);
+  try{const r=await fetch(SY.cfg.url,{method:'POST',body:JSON.stringify(Object.assign({action,key:SY.cfg.key},payload||{})),signal:ctl.signal});
+    const j=await r.json();if(!j.ok){const e=new Error(j.error||'error');e.code=j.error;throw e;}return j;}
+  finally{clearTimeout(to);}
 }
+const blobToB64=b=>new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(String(r.result).split(',')[1]);r.onerror=()=>rej(r.error);r.readAsDataURL(b);});
+async function uploadDrive(b){const j=await api('photo',{mime:b.type||'image/jpeg',name:'camp-'+newId()+'.jpg',b64:await blobToB64(b)},90000);return 'd_'+j.id;}
+
+const localAssets={
+  upload:async b=>{
+    if(SY.cfg&&navigator.onLine){try{return {id:await uploadDrive(b)};}catch(e){if(e.code==='key')throw e;}}
+    const id='l_'+newId();await LDB.put('photos',id,b);URLS.set(id,URL.createObjectURL(b));return {id};},
+  delete:async id=>{
+    if(isDrive(id)){if(SY.cfg)api('delphoto',{id:id.slice(2)}).catch(()=>{});return {deleted:true};}
+    await LDB.del('photos',id);const u=URLS.get(id);if(u)URL.revokeObjectURL(u);URLS.delete(id);return {deleted:true};}
+};
+
+/* 把只存在手機裡的照片補傳到雲端硬碟 */
+async function uploadPendingPhotos(){
+  for(const t of [...S.trips]){
+    const ph=t.photos||[];if(!ph.some(id=>!isDrive(id)))continue;
+    const out=[];let changed=false;
+    for(const id of ph){
+      if(isDrive(id)){out.push(id);continue;}
+      const b=await LDB.get('photos',id);if(!b){changed=true;continue;}
+      const nid=await uploadDrive(b);out.push(nid);changed=true;
+      await LDB.del('photos',id).catch(()=>{});const u=URLS.get(id);if(u)URL.revokeObjectURL(u);URLS.delete(id);
+    }
+    if(changed){const cur=S.trips.find(x=>x.id===t.id);if(cur){cur.photos=out;const d=getLocal('trips/'+t.id);setLocal('trips/'+t.id,clone(d));markDirty('trips/'+t.id);}}
+  }
+}
+
+function applyRemote(docs,first){
+  let changed=false;
+  for(const [k,r] of Object.entries(docs)){
+    if(k.startsWith('meta/'))continue;
+    const m=SY.meta[k]||{v:0,b:null};
+    if(r.v<=m.v&&!first)continue;
+    const theirs=r.d===null?null:r.d;
+    if(!m.dirty||first){setLocal(k,clone(theirs));SY.meta[k]={v:r.v,b:theirs};}
+    else{const mine=getLocal(k);const merged=mine===undefined&&theirs===null?null:merge3(m.b===null?undefined:m.b,mine,theirs===null?undefined:theirs);
+      setLocal(k,merged===undefined?null:clone(merged));SY.meta[k]={v:r.v,b:theirs,dirty:true};}
+    changed=true;
+  }
+  if(changed)saveMeta();
+  return changed;
+}
+
+async function syncNow(){
+  if(!SY.cfg)return;
+  if(SY.busy){SY.again=true;return;}
+  if(!navigator.onLine){SY.status='offline';paintSync();return;}
+  SY.busy=true;SY.status='syncing';paintSync();
+  try{
+    const first=SY.first;
+    const pull=await api('pull');
+    const changed=applyRemote(pull.docs||{},first);
+    if(first){SY.first=false;SY.cfg.first=false;await LDB.put('docs','meta/sync',SY.cfg);
+      for(const k of docKeys())if(!(k in (pull.docs||{})))markDirty(k);}
+    if(changed)render();
+    await uploadPendingPhotos();
+    for(let round=0;round<4;round++){
+      const dirty=Object.entries(SY.meta).filter(([,m])=>m.dirty).map(([k])=>k);
+      if(!dirty.length)break;
+      for(const k of dirty){
+        const m=SY.meta[k];const d=getLocal(k);const sent=d===undefined?null:clone(d);
+        const r=await api('put',{doc:k,data:sent,base:m.v});
+        if(r.conflict){applyRemote({[k]:{v:r.v,d:r.d}},false);render();continue;}
+        const now=getLocal(k);
+        SY.meta[k]={v:r.v,b:sent,dirty:!same(now===undefined?null:now,sent)};
+      }
+      saveMeta();
+    }
+    SY.status='ok';SY.last=new Date();
+  }catch(e){SY.status=e&&e.code==='key'?'badkey':(navigator.onLine?'error':'offline');}
+  finally{SY.busy=false;paintSync();if(SY.again){SY.again=false;setTimeout(syncNow,300);}}
+}
+function syncLabel(){
+  if(!SY.cfg)return '';
+  return {syncing:'同步中…',ok:'已同步',offline:'離線中，有網路時會自動同步',error:'同步失敗，稍後會再試',badkey:'通行碼不對，請重新設定',off:''}[SY.status]||'';
+}
+function paintSync(){
+  const el=document.getElementById('syncchip');if(el){el.textContent=syncLabel();el.className='syncchip s-'+SY.status;el.hidden=!SY.cfg;}
+  const sc=document.getElementById('syncstate');if(sc)sc.textContent=syncDetail();
+}
+function syncDetail(){
+  if(!SY.cfg)return '';const t=SY.last;
+  return syncLabel()+(t?`（最後同步 ${t.getHours()}:${String(t.getMinutes()).padStart(2,'0')}）`:'');
+}
+setInterval(()=>{if(SY.cfg&&document.visibilityState==='visible')syncNow();},20000);
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')syncNow();});
+addEventListener('online',()=>syncNow());
+addEventListener('offline',()=>{SY.status='offline';paintSync();});
+
+function parseSyncCode(raw,key){
+  raw=String(raw||'').trim();let url=raw,k=String(key||'').trim();
+  const h=raw.indexOf('#');if(h>0){url=raw.slice(0,h);if(!k)k=raw.slice(h+1);}
+  return {url:url.trim(),key:k.trim()};
+}
+async function connectSync(raw,key){
+  const c=parseSyncCode(raw,key);
+  if(!/^https:\/\/script\.google\.com\/.+\/exec$/.test(c.url))throw Object.assign(new Error(),{msg:'同步網址不對，應該是 https://script.google.com/ 開頭、/exec 結尾。'});
+  if(!c.key)throw Object.assign(new Error(),{msg:'請填通行碼。'});
+  const prev=SY.cfg;SY.cfg={url:c.url,key:c.key,first:true};
+  try{await api('ping');}catch(e){SY.cfg=prev;throw Object.assign(new Error(),{msg:e.code==='key'?'通行碼不對，請再確認一次。':'連不到同步網址，請確認網址和網路。'});}
+  SY.first=true;SY.meta={};await LDB.put('docs','meta/sync',SY.cfg);saveMeta();
+  await syncNow();
+}
+async function disconnectSync(){SY.cfg=null;SY.status='off';SY.meta={};await LDB.del('docs','meta/sync');await LDB.del('docs','meta/syncstate');render();}
+
 let META={};
 (async function init(){
   try{
     S.db=localDb;S.assets=localAssets;
-    const [g,m,meta]=await Promise.all([LDB.get('docs','gear/main'),LDB.get('docs','menu/main'),LDB.get('docs','meta/main')]);
+    const [g,m,meta,cfg,st]=await Promise.all([LDB.get('docs','gear/main'),LDB.get('docs','menu/main'),LDB.get('docs','meta/main'),LDB.get('docs','meta/sync'),LDB.get('docs','meta/syncstate')]);
     S.gear=g||clone(SEED_GEAR);if(!S.gear.categories)S.gear.categories=[];
     S.menu=m||clone(SEED_MENU);normMenu();META=meta||{};
     if(!g)await LDB.put('docs','gear/main',clone(S.gear));
     if(!m)await LDB.put('docs','menu/main',clone(S.menu));
     (await LDB.all('photos')).forEach(([k,v])=>URLS.set(k,URL.createObjectURL(v)));
-    await reloadTrips();
+    const all=await LDB.all('docs');
+    S.trips=all.filter(([k])=>k.startsWith('trips/')).map(([k,v])=>Object.assign({},v,{id:k.slice(6)})).sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+    if(cfg){SY.cfg=cfg;SY.first=!!cfg.first;SY.meta=st||{};SY.status='syncing';}
     if(navigator.storage&&navigator.storage.persist)navigator.storage.persist().catch(()=>{});
   }catch(e){S.noDb=true;S.db=null;S.assets=null;S.gear=S.gear||clone(SEED_GEAR);S.menu=S.menu||clone(SEED_MENU);normMenu();}
   S.gearLoaded=S.menuLoaded=S.tripsLoaded=true;render();
+  if(SY.cfg)syncNow();
 })();
 
 /* ---------- 備份／還原 ---------- */
@@ -470,7 +616,7 @@ const blobToData=b=>new Promise((res,rej)=>{const r=new FileReader();r.onload=()
 function today(){const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}
 async function exportBackup(){
   toast('正在準備備份檔…');
-  const docs=(await LDB.all('docs')).filter(([k])=>k!=='meta/main');
+  const docs=(await LDB.all('docs')).filter(([k])=>!k.startsWith('meta/'));
   const photos={};for(const [k,b] of await LDB.all('photos'))photos[k]=await blobToData(b);
   const data={app:'camp-notebook',version:1,exportedAt:new Date().toISOString(),docs:Object.fromEntries(docs),photos};
   const name=`露營手帳備份-${today()}.json`;
@@ -492,11 +638,22 @@ $('#restorepick').addEventListener('change',async e=>{
 });
 async function doRestore(data){
   toast('還原中…');
-  await LDB.clear('docs');await LDB.clear('photos');
+  const keep=await LDB.get('docs','meta/sync');await LDB.clear('docs');await LDB.clear('photos');if(keep)await LDB.put('docs','meta/sync',Object.assign(keep,{first:false}));
   for(const [k,v] of Object.entries(data.docs))await LDB.put('docs',k,v);
   for(const [k,u] of Object.entries(data.photos||{})){const b=await (await fetch(u)).blob();await LDB.put('photos',k,b);}
   await LDB.put('docs','meta/main',{lastBackup:data.exportedAt});
   location.reload();
+}
+function syncCard(){
+  if(S.noDb)return '';
+  if(!SY.cfg)return `<section class="card bk"><h3>${catIcon('行前',2)}家人同步</h3>
+    <p>開啟後，清單、菜單、紀錄和照片會存到你的 Google 試算表和雲端硬碟，全家的手機都看得到同一份。</p>
+    <div class="tools"><button class="btn sun" data-act="openSync">開啟同步</button></div></section>`;
+  return `<section class="card bk"><h3>${catIcon('行前',2)}家人同步</h3>
+    <p id="syncstate">${syncDetail()}</p>
+    <p>要讓家人一起用：在他的手機打開露營手帳 →「紀錄」→「開啟同步」，貼上這個同步碼。</p>
+    <div class="tools"><button class="btn sun" data-act="copyFamily">複製給家人的同步碼</button><button class="btn" data-act="syncNow">立即同步</button>
+    <button class="btn ${S.confirm==='unsync'?'danger':'ghost'}" data-act="unsync">${S.confirm==='unsync'?'確定關閉這支手機的同步？':'關閉同步'}</button></div></section>`;
 }
 function backupCard(){
   if(S.noDb)return '';
@@ -504,9 +661,9 @@ function backupCard(){
   const days=last?Math.floor((Date.now()-last)/864e5):null;
   const ld=last?`${last.getFullYear()}/${last.getMonth()+1}/${last.getDate()}`:'';
   return `<section class="card bk"><h3>${catIcon('收納',1)}資料備份</h3>
-    <p>清單、菜單、紀錄和照片都存在這支手機裡。偶爾備份一次，換手機或清除瀏覽器資料時才救得回來。</p>
-    <p class="${!last||days>30?'warn':''}">${last?`上次備份：${ld}${days>30?`（已經 ${days} 天）`:''}`:'還沒有備份過'}</p>
-    <div class="tools"><button class="btn sun" data-act="backup">備份資料</button><button class="btn" data-act="restore">從備份還原</button></div></section>`;
+    <p>${SY.cfg?'把目前的資料另外存一份檔案，以防萬一。':'清單、菜單、紀錄和照片都存在這支手機裡。偶爾備份一次，換手機或清除瀏覽器資料時才救得回來。'}</p>
+    <p class="${(!last||days>30)&&!SY.cfg?'warn':''}">${last?`上次備份：${ld}${days>30?`（已經 ${days} 天）`:''}`:'還沒有備份過'}</p>
+    <div class="tools"><button class="btn ${SY.cfg?'':'sun'}" data-act="backup">備份資料</button>${SY.cfg?'':'<button class="btn" data-act="restore">從備份還原</button>'}</div>${SY.cfg?'<p>已開啟同步，資料會自動存到 Google。要從備份還原，請先關閉同步。</p>':''}</section>`;
 }
 
 /* ---------- render ---------- */
@@ -517,8 +674,9 @@ function render(){
   $('#banner').innerHTML=S.noDb?'<div class="banner">這個瀏覽器無法儲存資料（可能是無痕模式）。請用一般模式開啟，或從主畫面的圖示開啟。</div>'
     :(!S.canWrite?'<div class="banner">你目前只有檢視權限，無法修改內容。</div>':'');
   S.tab==='gear'?renderGear():S.tab==='menu'?renderMenu():renderTrips();
+  paintSync();
 }
-const BR='<span class="brand">CAMP · 露營手帳</span><br>';
+const BR='<span class="brand">CAMP · 露營手帳</span> <span id="syncchip" class="syncchip" hidden></span><br>';
 
 function renderGear(){
   $('#ttl').innerHTML=BR+'裝備清單<small>一項一項打包，出發囉！</small>';
@@ -673,7 +831,7 @@ function fmtDate(d,withYear){
 function endDate(d,n){const [y,m,dd]=d.split('-').map(Number);const t=new Date(y,m-1,dd+(+n||0));
   return `${t.getFullYear()}-${String(t.getMonth()+1).padStart(2,'0')}-${String(t.getDate()).padStart(2,'0')}`;}
 function rangeText(t,withYear){const n=+t.nights||0;return n>0?`${fmtDate(t.date,withYear)} – ${fmtDate(endDate(t.date,n))}`:fmtDate(t.date,withYear);}
-const blob=id=>URLS.get(id)||'';
+const blob=id=>isDrive(id)?`https://drive.google.com/thumbnail?id=${encodeURIComponent(id.slice(2))}&sz=w1600`:(URLS.get(id)||'');
 const hearts=n=>n?'♥'.repeat(n):'';
 
 function renderTrips(){
@@ -704,7 +862,7 @@ function renderTrips(){
       ${ph?`<img class="tcover" src="${blob(t.photos[0])}" alt="" loading="lazy">`:''}
     </button>`;
   }
-  h+='</div>'+backupCard();
+  h+='</div>'+syncCard()+backupCard();
   $('#view').innerHTML=h;
 }
 
@@ -742,6 +900,19 @@ function refreshSheet(){
       ${fg.length?`<div class="card box"><h4>這次忘了帶</h4><ul class="forgot">${fg.map((s,k)=>`<li><span>${esc(s)}</span>${inGear(s)?'<span class="tag off">已在清單</span>':S.canWrite?`<button class="chipb" data-act="addForgot" data-k="${k}">＋ 加進清單</button>`:''}</li>`).join('')}</ul></div>`:''}
       ${S.canWrite?`<div class="danger-zone"><button class="btn ${S.confirm==='trip'?'danger':'ghost'}" data-act="delTrip">${S.confirm==='trip'?'確定刪除這筆紀錄和照片？':'刪除這筆紀錄'}</button></div>`:''}
     </div>`;
+    return;
+  }
+  if(sheetState.kind==='sync'){
+    const f=sheetState;
+    el.innerHTML=`<div class="sheet-bar"><button class="btn ghost" data-act="close">取消</button><h3>開啟同步</h3><span style="width:64px"></span></div>
+    <form class="sheet-body" autocomplete="off" onsubmit="return false">
+      <p class="hint">第一次設定：填 Google Apps Script 部署後的「網頁應用程式網址」和試算表「設定」頁的通行碼。<br>家人加入：把你複製的同步碼整串貼在第一格，通行碼留空就好。</p>
+      <div class="field"><label for="s-url">同步網址（或同步碼）</label><textarea id="s-url" style="min-height:90px;font-size:14px" placeholder="https://script.google.com/macros/s/……/exec">${esc(f.url||'')}</textarea></div>
+      <div class="field"><label for="s-key">通行碼</label><input id="s-key" value="${esc(f.key||'')}" placeholder="家人用同步碼的話可以留空"></div>
+      ${f.err?`<div class="banner">${esc(f.err)}</div>`:''}
+      <button type="button" class="btn sun newtrip" data-act="doConnect" ${f.busy?'disabled':''}>${f.busy?'連線中…':'連線'}</button>
+      <p class="hint">連線後，如果雲端已經有資料（例如家人先設定好了），這支手機會改成顯示雲端那一份。</p>
+    </form>`;
     return;
   }
   if(sheetState.kind==='restore'){
@@ -889,6 +1060,16 @@ document.addEventListener('click',async e=>{
     case 'pickPhoto': readForm();$('#filepick').click();break;
     case 'rmPhoto':{readForm();const f=sheetState.form;const id=f.photos.splice(+b.dataset.k,1)[0];f.removed.push(id);refreshSheet();break;}
     case 'saveTrip': saveTrip();break;
+    case 'openSync': openSheet({kind:'sync'});break;
+    case 'doConnect':{const f=sheetState;f.url=$('#s-url').value;f.key=$('#s-key').value;f.busy=true;f.err='';refreshSheet();
+      try{await connectSync(f.url,f.key);closeSheet();render();toast('已開啟同步');}
+      catch(err){f.busy=false;f.err=err.msg||'連線失敗，請再試一次';refreshSheet();}
+      break;}
+    case 'copyFamily':{const t=SY.cfg.url+'#'+SY.cfg.key;try{await navigator.clipboard.writeText(t);toast('已複製，用 LINE 傳給家人');}catch(err){openSheet({kind:'copy',text:t});}break;}
+    case 'syncNow': syncNow();break;
+    case 'unsync':
+      if(S.confirm!=='unsync'){setConfirm('unsync');render();return;}
+      S.confirm=null;await disconnectSync();toast('這支手機已關閉同步，資料仍留在手機裡');break;
     case 'backup': exportBackup().catch(()=>toast('備份失敗，請再試一次'));break;
     case 'restore': $('#restorepick').click();break;
     case 'doRestore': doRestore(sheetState.data).catch(()=>toast('還原失敗，請再試一次'));break;
