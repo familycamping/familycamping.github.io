@@ -1,5 +1,5 @@
 // 露營手帳：讓網頁在沒有網路的營地也能打開
-const CACHE = 'camp-notebook-v4';
+const CACHE = 'camp-notebook-v5';
 const SHELL = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './apple-touch-icon.png'];
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL)));
@@ -11,6 +11,10 @@ self.addEventListener('activate', e => {
 self.addEventListener('fetch', e => {
   const req = e.request;
   if (req.method !== 'GET' || !req.url.startsWith('http')) return;
+  if (/open-meteo\.com/.test(req.url)) {
+    e.respondWith(fetch(req).catch(() => caches.match(req)));
+    return;
+  }
   e.respondWith(caches.open(CACHE).then(async c => {
     const hit = await c.match(req, { ignoreSearch: true });
     const net = fetch(req).then(res => {

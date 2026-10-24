@@ -239,7 +239,7 @@ li.edit:first-child{border-top:0}
 .lb .i{position:absolute;bottom:calc(14px + env(safe-area-inset-bottom,0px));left:0;right:0;text-align:center;color:#ddd;font-size:13px}
 
 /* floating tab bar */
-nav.tabs{position:fixed;z-index:20;left:50%;transform:translateX(-50%);bottom:calc(12px + env(safe-area-inset-bottom,0px));width:min(380px,calc(100% - 32px));background:var(--surface);border-radius:999px;padding:6px;display:flex;gap:4px;box-shadow:0 4px 0 var(--line),0 10px 26px var(--shadow)}
+nav.tabs{position:fixed;z-index:20;left:50%;transform:translateX(-50%);bottom:calc(12px + env(safe-area-inset-bottom,0px));width:min(440px,calc(100% - 24px));background:var(--surface);border-radius:999px;padding:6px;display:flex;gap:4px;box-shadow:0 4px 0 var(--line),0 10px 26px var(--shadow)}
 nav.tabs button{flex:1;border:0;background:none;border-radius:999px;padding:8px 6px;display:flex;align-items:center;justify-content:center;gap:6px;font-size:14px;font-weight:700;color:var(--muted)}
 nav.tabs button svg{width:22px;height:22px}
 nav.tabs button[aria-selected="true"]{background:var(--sun);color:var(--on-sun);box-shadow:0 3px 0 var(--sun-deep)}
@@ -268,6 +268,43 @@ nav.tabs button[aria-selected="true"]{background:var(--sun);color:var(--on-sun);
 .slotpick button{border:2px solid var(--line);background:var(--surface);border-radius:999px;padding:6px 16px;font-weight:700;color:var(--muted);box-shadow:0 2px 0 var(--line)}
 .slotpick button[aria-pressed="true"]{background:var(--sun);border-color:var(--sun-deep);color:var(--on-sun);box-shadow:0 2px 0 var(--sun-deep)}
 .xbtn{flex:none;border:0;background:var(--bg);color:var(--muted);border-radius:50%;width:28px;height:28px;font-size:13px}
+.wx-places{display:flex;gap:8px;overflow-x:auto;margin-top:16px;padding:2px 2px 6px}
+.wx-place{flex:none;border:2px solid var(--line);background:var(--surface);border-radius:999px;padding:6px 14px;font-weight:700;color:var(--muted);box-shadow:0 2px 0 var(--line)}
+.wx-place.on{background:var(--sky);border-color:var(--sky);color:#fff;box-shadow:0 2px 0 color-mix(in srgb,var(--sky) 65%,#000)}
+.wx-place.add{border-style:dashed;color:var(--sky);box-shadow:none}
+.wx-trip{margin-top:10px;padding:14px;display:grid;gap:10px}
+.verdict{border-radius:16px;padding:12px 14px;display:grid;gap:2px}
+.verdict b{font-family:var(--f-display);font-weight:400;font-size:22px}
+.verdict span{font-size:13px}
+.verdict.v0{background:color-mix(in srgb,var(--grass) 30%,var(--surface));color:var(--ink)}
+.verdict.v1{background:color-mix(in srgb,var(--sun) 35%,var(--surface));color:var(--ink)}
+.verdict.v2{background:var(--heart);color:#fff}
+.wx-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:22px 4px 8px;font-family:var(--f-display);font-size:17px}
+.wx-list{padding:0}
+.wx-day{display:flex;gap:12px;padding:10px 14px;border-top:2px dotted var(--line);align-items:flex-start}
+.wx-day:first-child{border-top:0}
+.wx-day.trip{background:var(--sky-soft)}
+.wx-day.l2{box-shadow:inset 4px 0 0 var(--heart)}.wx-day.l1{box-shadow:inset 4px 0 0 var(--sun-deep)}
+.wx-date{flex:none;width:44px;display:grid;line-height:1.15;font-variant-numeric:tabular-nums}
+.wx-date b{font-size:16px}.wx-date small{font-size:12px;color:var(--muted)}
+.wx-main{flex:1;min-width:0;display:grid;gap:3px}
+.wx-top{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.wx-code{font-weight:700;font-size:14px;border-radius:999px;padding:1px 9px}
+.wx-code.sunny{background:color-mix(in srgb,var(--sun) 35%,transparent);color:var(--on-sun)}
+.wx-code.overcast{background:var(--bg);color:var(--muted)}
+.wx-code.rain{background:var(--sky-soft);color:var(--sky)}
+.wx-code.storm{background:var(--heart-soft);color:var(--heart)}
+.wx-t{font-variant-numeric:tabular-nums;font-weight:700}
+.wx-nums{display:flex;gap:10px;flex-wrap:wrap;font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.wx-risk{font-size:12px;color:var(--heart);font-weight:700}
+.wx-day.l0 .wx-risk{color:var(--sky)}
+.wx-links{margin-top:22px;padding:16px;display:grid;gap:10px}
+.wx-links h3{margin:0;font-family:var(--f-display);font-weight:400;font-size:18px;display:flex;align-items:center;gap:8px}
+.wx-links p{margin:0;font-size:13px;color:var(--muted)}
+a.btn{text-decoration:none;color:inherit}
+a.btn.sun{color:var(--on-sun)}
+nav.tabs button{font-size:13px;gap:4px}
+@media (max-width:380px){nav.tabs button svg{display:none}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
 </head>
@@ -372,6 +409,8 @@ nav.tabs button[aria-selected="true"]{background:var(--sun);color:var(--on-sun);
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4h12a1 1 0 0 1 1 1v15a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1z"/><path d="M9 9l1.5 1.5L13 8M9 15h6"/></svg>裝備</button>
   <button id="tab-menu" role="tab" aria-selected="false" data-act="tab" data-tab="menu">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3v8a2 2 0 0 0 4 0V3M8 11v10M17 3c-2 0-3 3-3 7h3v11"/></svg>菜單</button>
+  <button id="tab-weather" role="tab" aria-selected="false" data-act="tab" data-tab="weather">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 18h10a4 4 0 0 0 .5-7.97A6 6 0 0 0 6.1 11.1 3.5 3.5 0 0 0 7 18z"/><path d="M9 21l1-2M13 21l1-2"/></svg>天氣</button>
   <button id="tab-trips" role="tab" aria-selected="false" data-act="tab" data-tab="trips">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3L2.5 20h19L12 3z"/><path d="M12 9l-3.5 11M12 9l3.5 11"/></svg>紀錄</button>
 </nav>
@@ -440,13 +479,14 @@ const isDrive=id=>typeof id==='string'&&id.startsWith('d_');
 
 /* 同步狀態：每份資料記住伺服器版本 v、上次同步的內容 b、是否有還沒上傳的修改 dirty */
 const SY={cfg:null,meta:{},busy:false,again:false,status:'off',last:null,timer:null,first:false};
-const docKeys=()=>['gear/main','menu/main',...S.trips.map(t=>'trips/'+t.id)];
+const docKeys=()=>['gear/main','menu/main',...(S.wx?['weather/main']:[]),...S.trips.map(t=>'trips/'+t.id)];
 function getLocal(k){
-  if(k==='gear/main')return S.gear;if(k==='menu/main')return S.menu;
+  if(k==='gear/main')return S.gear;if(k==='menu/main')return S.menu;if(k==='weather/main')return S.wx;
   if(k.startsWith('trips/')){const t=S.trips.find(x=>x.id===k.slice(6));if(!t)return undefined;const c=Object.assign({},t);delete c.id;return c;}
 }
 function setLocal(k,d){
   if(k==='gear/main'){S.gear=d||{categories:[]};if(!S.gear.categories)S.gear.categories=[];}
+  else if(k==='weather/main'){S.wx=d||null;normWx();}
   else if(k==='menu/main'){S.menu=d||{};normMenu();}
   else if(k.startsWith('trips/')){const id=k.slice(6);S.trips=S.trips.filter(x=>x.id!==id);
     if(d)S.trips.push(Object.assign({},d,{id}));S.trips.sort((a,b)=>(b.date||'').localeCompare(a.date||''));}
@@ -595,9 +635,9 @@ let META={};
 (async function init(){
   try{
     S.db=localDb;S.assets=localAssets;
-    const [g,m,meta,cfg,st]=await Promise.all([LDB.get('docs','gear/main'),LDB.get('docs','menu/main'),LDB.get('docs','meta/main'),LDB.get('docs','meta/sync'),LDB.get('docs','meta/syncstate')]);
+    const [g,m,wx,meta,cfg,st]=await Promise.all([LDB.get('docs','gear/main'),LDB.get('docs','menu/main'),LDB.get('docs','weather/main'),LDB.get('docs','meta/main'),LDB.get('docs','meta/sync'),LDB.get('docs','meta/syncstate')]);
     S.gear=g||clone(SEED_GEAR);if(!S.gear.categories)S.gear.categories=[];
-    S.menu=m||clone(SEED_MENU);normMenu();META=meta||{};
+    S.menu=m||clone(SEED_MENU);normMenu();S.wx=wx||null;normWx();META=meta||{};
     if(!g)await LDB.put('docs','gear/main',clone(S.gear));
     if(!m)await LDB.put('docs','menu/main',clone(S.menu));
     (await LDB.all('photos')).forEach(([k,v])=>URLS.set(k,URL.createObjectURL(v)));
@@ -670,9 +710,10 @@ function render(){
   $('#tab-gear').setAttribute('aria-selected',S.tab==='gear');
   $('#tab-trips').setAttribute('aria-selected',S.tab==='trips');
   $('#tab-menu').setAttribute('aria-selected',S.tab==='menu');
+  $('#tab-weather').setAttribute('aria-selected',S.tab==='weather');
   $('#banner').innerHTML=S.noDb?'<div class="banner">這個瀏覽器無法儲存資料（可能是無痕模式）。請用一般模式開啟，或從主畫面的圖示開啟。</div>'
     :(!S.canWrite?'<div class="banner">你目前只有檢視權限，無法修改內容。</div>':'');
-  S.tab==='gear'?renderGear():S.tab==='menu'?renderMenu():renderTrips();
+  S.tab==='gear'?renderGear():S.tab==='menu'?renderMenu():S.tab==='weather'?renderWeather():renderTrips();
   paintSync();
 }
 const BR='<span class="brand">CAMP · 露營手帳</span> <span id="syncchip" class="syncchip" hidden></span><br>';
@@ -833,6 +874,133 @@ function rangeText(t,withYear){const n=+t.nights||0;return n>0?`${fmtDate(t.date
 const blob=id=>isDrive(id)?`https://drive.google.com/thumbnail?id=${encodeURIComponent(id.slice(2))}&sz=w1600`:(URLS.get(id)||'');
 const hearts=n=>n?'♥'.repeat(n):'';
 
+/* ---------- 天氣（Open-Meteo，免費、不用帳號） ---------- */
+const WX={data:{},loading:false,err:'',search:null,searching:false};
+function normWx(){S.wx=S.wx||{};S.wx.places=S.wx.places||[];if(!S.wx.days)S.wx.days=2;}
+const saveWx=()=>{if(S.db)S.db.doc('weather/main').set(clone(S.wx));};
+const WCODE=c=>c===0?'晴':c<=2?'晴時多雲':c===3?'陰天':c<=48?'有霧':c<=57?'毛毛雨':c<=63?'下雨':c<=67?'大雨':c<=77?'下雪':c<=81?'陣雨':c===82?'豪大陣雨':'雷雨';
+const WCLS=c=>c<=2?'sunny':c<=48?'overcast':c>=95?'storm':'rain';
+const BEAU=[1,6,12,20,29,39,50,62,75,89,103,118];
+const beaufort=k=>{let b=0;while(b<BEAU.length&&k>=BEAU[b])b++;return b;};
+function dayRisk(d){
+  const r=[];let lv=0;
+  const g=d.gust,b=beaufort(g);
+  if(b>=8){r.push(`陣風 ${b} 級，帳篷天幕危險`);lv=2;}else if(b>=6){r.push(`陣風 ${b} 級，要加強營繩營釘`);lv=Math.max(lv,1);}
+  if(d.rain>=80){r.push(`雨量 ${Math.round(d.rain)} 毫米，豪雨`);lv=2;}else if(d.rain>=40){r.push(`雨量 ${Math.round(d.rain)} 毫米，大雨`);lv=Math.max(lv,1);}
+  else if(d.pop>=70){r.push('很可能下雨，帶雨具和地布');lv=Math.max(lv,1);}
+  if(d.code>=95){r.push('可能有雷雨');lv=Math.max(lv,1);}
+  if(d.tmin<=10){r.push(`最低 ${Math.round(d.tmin)}°C，帶暖爐和電熱毯`);}
+  return {lv,r};
+}
+async function geoSearch(q){
+  q=q.trim();
+  const m=q.match(/^\s*(-?\d+(?:\.\d+)?)\s*[,，\s]\s*(-?\d+(?:\.\d+)?)\s*$/);
+  if(m)return [{name:`座標 ${(+m[1]).toFixed(3)}, ${(+m[2]).toFixed(3)}`,lat:+m[1],lon:+m[2],sub:'自訂座標'}];
+  const tries=[q,q+'鄉',q+'鎮',q+'區',q+'市',q.replace(/[鄉鎮區市縣]$/,'')].filter((v,i,a)=>v.length>=2&&a.indexOf(v)===i);
+  const out=[],seen=new Set();
+  for(const t of tries){
+    try{const r=await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(t)}&count=8&language=zh&format=json`);
+      const j=await r.json();
+      for(const x of j.results||[]){const k=x.latitude.toFixed(2)+','+x.longitude.toFixed(2);if(seen.has(k))continue;seen.add(k);
+        out.push({name:x.name,lat:x.latitude,lon:x.longitude,sub:[x.admin1,x.admin2,x.country].filter(Boolean).join('・'),tw:x.country_code==='TW'});}}
+    catch(e){}
+    if(out.some(x=>x.tw))break;
+  }
+  return out.sort((a,b)=>(b.tw?1:0)-(a.tw?1:0)).slice(0,8);
+}
+async function loadForecast(p,force){
+  const k=p.id;const c=WX.data[k];
+  if(c&&!force&&Date.now()-c.at<30*60*1000)return c;
+  const url=`https://api.open-meteo.com/v1/forecast?latitude=${p.lat}&longitude=${p.lon}&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max,precipitation_sum,wind_gusts_10m_max,wind_speed_10m_max&timezone=Asia%2FTaipei&forecast_days=16&wind_speed_unit=kmh`;
+  const j=await (await fetch(url)).json();
+  if(!j.daily)throw new Error('no data');
+  const D=j.daily;
+  const days=D.time.map((t,i)=>({date:t,code:D.weather_code[i],tmax:D.temperature_2m_max[i],tmin:D.temperature_2m_min[i],pop:D.precipitation_probability_max[i]??0,rain:D.precipitation_sum[i]??0,gust:D.wind_gusts_10m_max[i]??0,wind:D.wind_speed_10m_max[i]??0}));
+  const v={at:Date.now(),days};WX.data[k]=v;
+  try{LDB.put('docs','meta/wx-'+k,v);}catch(e){}
+  return v;
+}
+function wxPlace(){normWx();return S.wx.places.find(p=>p.id===S.wx.sel)||S.wx.places[0];}
+async function refreshWx(force){
+  const p=wxPlace();if(!p)return;
+  if(!WX.data[p.id]){try{const c=await LDB.get('docs','meta/wx-'+p.id);if(c)WX.data[p.id]=c;}catch(e){}}
+  WX.loading=true;WX.err='';if(S.tab==='weather')render();
+  try{await loadForecast(p,force);}catch(e){WX.err=navigator.onLine?'天氣資料暫時抓不到，稍後再試。':'沒有網路，顯示的是上次查到的天氣。';}
+  WX.loading=false;if(S.tab==='weather')render();
+}
+function tripDates(){
+  const d=S.wx.date;if(!d)return new Set();
+  const out=new Set();const [y,m,dd]=d.split('-').map(Number);
+  for(let i=0;i<=(+S.wx.days||0);i++){const t=new Date(y,m-1,dd+i);out.add(`${t.getFullYear()}-${String(t.getMonth()+1).padStart(2,'0')}-${String(t.getDate()).padStart(2,'0')}`);}
+  return out;
+}
+function renderWeather(){
+  normWx();
+  $('#ttl').innerHTML=BR+'營地天氣<small>出發前看雨量、風力和溫度</small>';
+  $('#hdrBtn').innerHTML='';
+  const P=S.wx.places,p=wxPlace(),can=S.canWrite&&!S.noDb;
+  let h=`<div class="wx-places">${P.map(x=>`<button class="wx-place ${p&&x.id===p.id?'on':''}" data-act="wxSel" data-id="${x.id}">${esc(x.name)}</button>`).join('')}
+    <button class="wx-place add" data-act="wxAdd">＋ 新增營地</button></div>`;
+  if(!p){
+    h+=`<div class="card empty"><svg class="wide" aria-hidden="true"><use href="#campScene"/></svg><p>先新增要去的營地</p><p>輸入鄉鎮名稱，例如「南庄」「尖石」「仁愛」，就能查到未來 16 天的天氣。</p>
+      <button class="btn sun" data-act="wxAdd">＋ 新增營地</button></div>`;
+    h+=wxLinks(null);$('#view').innerHTML=h;return;
+  }
+  const c=WX.data[p.id];const TD=tripDates();
+  h+=`<section class="card wx-trip">
+    <div class="two"><div class="field"><label for="wx-date">出發日期</label><input type="date" id="wx-date" value="${esc(S.wx.date||'')}"></div>
+    <div class="field"><label for="wx-days">住幾晚</label><select id="wx-days">${[0,1,2,3,4,5].map(n=>`<option value="${n}" ${+S.wx.days===n?'selected':''}>${n?n+' 晚':'當日來回'}</option>`).join('')}</select></div></div>`;
+  if(c&&TD.size){
+    const ds=c.days.filter(d=>TD.has(d.date));
+    if(!ds.length)h+=`<p class="hint">出發日期超過 16 天，還查不到預報。出發前一週再來看。</p>`;
+    else{
+      const lv=Math.max(...ds.map(d=>dayRisk(d).lv));
+      const far=ds.some(d=>(new Date(d.date)-Date.now())/864e5>7);
+      h+=`<div class="verdict v${lv}"><b>${['適合出發','要注意天氣','不建議出發'][lv]}</b>
+        <span>${lv===2?'有強風或豪雨，建議改期。':lv===1?'可以去，但要做好防風防雨。':'預報看起來不錯！'}${far?'（超過 7 天的預報變化大，出發前再確認）':''}</span></div>`;
+    }
+  }else if(!S.wx.date)h+=`<p class="hint">填出發日期，就會幫你判斷那幾天適不適合去。</p>`;
+  h+=`</section>`;
+  h+=`<div class="wx-head"><span>${esc(p.name)}・未來 16 天</span><button class="btn" data-act="wxRefresh" ${WX.loading?'disabled':''}>${WX.loading?'更新中…':'重新整理'}</button></div>`;
+  if(WX.err)h+=`<div class="banner">${esc(WX.err)}</div>`;
+  if(!c&&WX.loading)h+=`<div class="loading">查詢天氣中…</div>`;
+  if(c){
+    const ago=Math.round((Date.now()-c.at)/60000);
+    h+=`<ul class="items card wx-list">`+c.days.map(d=>{const {lv,r}=dayRisk(d);const [y,m,dd]=d.date.split('-').map(Number);const wd=WK[new Date(y,m-1,dd).getDay()];
+      return `<li class="wx-day ${TD.has(d.date)?'trip':''} l${lv}">
+        <div class="wx-date"><b>${m}/${dd}</b><small>週${wd}</small></div>
+        <div class="wx-main"><div class="wx-top"><span class="wx-code ${WCLS(d.code)}">${WCODE(d.code)}</span><span class="wx-t">${Math.round(d.tmin)}–${Math.round(d.tmax)}°C</span>${TD.has(d.date)?'<span class="tag must">出發</span>':''}</div>
+        <div class="wx-nums"><span>降雨 ${d.pop}%</span><span>雨量 ${d.rain<1?'0':Math.round(d.rain)} mm</span><span>陣風 ${beaufort(d.gust)} 級</span></div>
+        ${r.length?`<div class="wx-risk">${r.map(esc).join('・')}</div>`:''}</div></li>`;}).join('')+`</ul>
+      <p class="hint" style="margin:8px 4px 0">更新於 ${ago<1?'剛剛':ago+' 分鐘前'}。資料來源：Open-Meteo 預報模式。</p>`;
+  }
+  h+=wxLinks(p);
+  if(can)h+=`<div class="cat-actions"><button class="btn ${S.confirm==='wxdel'?'danger':'ghost'}" data-act="wxDel">${S.confirm==='wxdel'?`確定刪除「${esc(p.name)}」？`:'刪除這個營地'}</button></div>`;
+  $('#view').innerHTML=h;
+}
+function wxLinks(p){
+  return `<section class="card wx-links"><h3>${catIcon('行前',4)}颱風和官方預報</h3>
+    <p>颱風動態、警報和停班停課，以中央氣象署為準。</p>
+    <div class="tools">
+      <a class="btn sun" href="https://www.cwa.gov.tw/V8/C/P/Typhoon/TY_NEWS.html" target="_blank" rel="noopener">颱風消息</a>
+      <a class="btn" href="https://www.cwa.gov.tw/V8/C/W/County/index.html" target="_blank" rel="noopener">縣市天氣預報</a>
+      ${p?`<a class="btn" href="https://www.windy.com/${p.lat.toFixed(3)}/${p.lon.toFixed(3)}?${p.lat.toFixed(3)},${p.lon.toFixed(3)},10" target="_blank" rel="noopener">風雨動畫（Windy）</a>`:''}
+    </div></section>`;
+}
+function renderWxSheet(el){
+  const f=sheetState;
+  el.innerHTML=`<div class="sheet-bar"><button class="btn ghost" data-act="close">取消</button><h3>新增營地</h3><span style="width:64px"></span></div>
+  <form class="sheet-body" autocomplete="off" onsubmit="return false">
+    <div class="field"><label for="wx-q">營地在哪裡</label><input id="wx-q" value="${esc(f.q||'')}" placeholder="例如：南庄、尖石、仁愛" data-enter="wxSearch"></div>
+    <button type="button" class="btn sun" data-act="wxSearch" ${f.busy?'disabled':''}>${f.busy?'搜尋中…':'搜尋'}</button>
+    ${f.res?(f.res.length?`<ul class="items card">${f.res.map((r,i)=>`<li class="item tap" data-act="wxPick" data-k="${i}"><span class="nmw"><span class="nm">${esc(r.name)}</span><span class="nt">${esc(r.sub||'')}</span></span><span class="tag off">選這個</span></li>`).join('')}</ul>`
+      :`<div class="banner">找不到「${esc(f.q)}」。試試換成鄉鎮名稱（例如「南庄」改「南庄鄉」），或用英文拼音（Nanzhuang）。也可以在 Google 地圖長按營地，複製座標貼進來，例如 24.597, 121.002。</div>`):''}
+    ${f.pick?`<div class="field"><label for="wx-name">營地名稱（顯示用）</label><input id="wx-name" value="${esc(f.pick.name)}"></div>
+      <button type="button" class="btn sun newtrip" data-act="wxSave">儲存這個營地</button>`:''}
+    <p class="hint">在 Google 地圖長按營地位置，上方會出現座標（例如 24.597, 121.002），複製貼到上面搜尋，位置最準。</p>
+  </form>`;
+}
+
 function renderTrips(){
   $('#ttl').innerHTML=BR+'露營紀錄<small>我們一家去過的營地</small>';
   $('#hdrBtn').innerHTML='';
@@ -901,6 +1069,7 @@ function refreshSheet(){
     </div>`;
     return;
   }
+  if(sheetState.kind==='wxadd'){renderWxSheet(el);return;}
   if(sheetState.kind==='sync'){
     const f=sheetState;
     el.innerHTML=`<div class="sheet-bar"><button class="btn ghost" data-act="close">取消</button><h3>開啟同步</h3><span style="width:64px"></span></div>
@@ -1021,7 +1190,7 @@ document.addEventListener('click',async e=>{
   const act=b.dataset.act, li=b.closest('[data-i]'), cat=b.closest('[data-c]');
   const cid=cat&&cat.dataset.c, iid=li&&li.dataset.i;
   switch(act){
-    case 'tab': S.adding=null;S.tab=b.dataset.tab;S.edit=false;S.confirm=null;render();window.scrollTo(0,0);break;
+    case 'tab': S.adding=null;S.tab=b.dataset.tab;S.edit=false;S.confirm=null;render();window.scrollTo(0,0);if(S.tab==='weather')refreshWx();break;
     case 'edit': S.adding=null;S.edit=!S.edit;S.confirm=null;render();break;
     case 'hidePacked': S.hidePacked=!S.hidePacked;render();break;
     case 'mustOnly': S.mustOnly=!S.mustOnly;render();break;
@@ -1071,6 +1240,16 @@ document.addEventListener('click',async e=>{
     case 'backup': exportBackup().catch(()=>toast('備份失敗，請再試一次'));break;
     case 'restore': $('#restorepick').click();break;
     case 'doRestore': doRestore(sheetState.data).catch(()=>toast('還原失敗，請再試一次'));break;
+    case 'wxSel': S.wx.sel=b.dataset.id;saveWx();render();refreshWx();break;
+    case 'wxAdd': openSheet({kind:'wxadd'});setTimeout(()=>{const q=$('#wx-q');q&&q.focus();},80);break;
+    case 'wxSearch': wxSearch();break;
+    case 'wxPick': sheetState.pick=clone(sheetState.res[+b.dataset.k]);refreshSheet();break;
+    case 'wxSave':{const p=sheetState.pick;const nm=($('#wx-name').value||p.name).trim();normWx();
+      const id=newId();S.wx.places.push({id,name:nm,lat:+p.lat.toFixed(4),lon:+p.lon.toFixed(4)});S.wx.sel=id;saveWx();closeSheet();render();refreshWx(true);break;}
+    case 'wxRefresh': refreshWx(true);break;
+    case 'wxDel':
+      if(S.confirm!=='wxdel'){setConfirm('wxdel');render();return;}
+      S.confirm=null;{const p=wxPlace();S.wx.places=S.wx.places.filter(x=>x.id!==p.id);S.wx.sel=S.wx.places[0]&&S.wx.places[0].id;saveWx();render();refreshWx();}break;
     case 'menuView': S.menuView=b.dataset.v;S.adding=null;render();break;
     case 'prepLeft': S.prepLeft=!S.prepLeft;render();break;
     case 'prepToggle':{const n=b.dataset.n;const v=!S.menu.ready[n];if(v)S.menu.ready[n]=true;else delete S.menu.ready[n];S.pop=v?'p:'+n:null;render();S.pop=null;saveMenu();break;}
@@ -1117,11 +1296,12 @@ document.addEventListener('change',e=>{
   const el=e.target, a=el.dataset.act;
   if(a==='renameItem'||a==='noteItem'){const li=el.closest('[data-i]');const {i}=findItem(li.dataset.c,li.dataset.i);if(!i)return;const v=el.value.trim();
     if(a==='renameItem'){if(v&&v!==i.name){i.name=v;saveGear();}}else if(v!==(i.note||'')){if(v)i.note=v;else delete i.note;saveGear();}}
+  if(el.id==='wx-date'||el.id==='wx-days'){normWx();if(el.id==='wx-date')S.wx.date=el.value;else S.wx.days=+el.value;saveWx();render();return;}
   if(a==='renameCat'){const c=S.gear.categories.find(c=>c.id===el.closest('[data-c]').dataset.c);const v=el.value.trim();if(c&&v&&v!==c.name){c.name=v;saveGear();}}
 });
 document.addEventListener('keydown',e=>{
   if(e.key==='Enter'&&e.target.dataset&&e.target.dataset.enter){e.preventDefault();const cat=e.target.closest('[data-c]');
-    const en=e.target.dataset.enter;en==='addItem'?addItem(cat.dataset.c):en==='addExtra'?addExtra():addCat();}
+    const en=e.target.dataset.enter;en==='wxSearch'?wxSearch():en==='addItem'?addItem(cat.dataset.c):en==='addExtra'?addExtra():addCat();}
   if(e.key==='Escape'&&!$('#lb').hidden)$('#lb').hidden=true;
 });
 function addItem(cid){const inp=$('#add-'+cid);const v=inp.value.trim();if(!v)return;
@@ -1130,6 +1310,10 @@ function addItem(cid){const inp=$('#add-'+cid);const v=inp.value.trim();if(!v)re
 function readMeal(){const m=sheetState.m;const d=$('#m-day');if(d)m.day=+d.value;const di=$('#m-dish');if(di)m.dish=di.value;const ig=$('#m-ings');if(ig)m.ings=[...new Set(splitIngs(ig.value))];}
 function addExtra(){const inp=$('#add-extra');const v=inp.value.trim();if(!v)return;
   if(!S.menu.extras.some(x=>x.name===v))S.menu.extras.push({id:uid(),name:v});render();saveMenu();const n=$('#add-extra');n&&n.focus();}
+async function wxSearch(){const f=sheetState;f.q=$('#wx-q').value.trim();if(f.q.length<2){toast('請輸入至少兩個字');return;}
+  f.busy=true;f.pick=null;refreshSheet();
+  try{f.res=await geoSearch(f.q);}catch(e){f.res=[];}
+  f.busy=false;if(f.res.length===1)f.pick=clone(f.res[0]);refreshSheet();}
 function addCat(){const inp=$('#newcat');const v=inp.value.trim();if(!v)return;
   S.gear.categories.push({id:uid(),name:v,items:[]});render();saveGear();}
 
