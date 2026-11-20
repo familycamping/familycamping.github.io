@@ -1335,7 +1335,25 @@ async function saveTrip(){
 render();
 </script>
 <script>
-if('serviceWorker' in navigator&&location.protocol==='https:')navigator.serviceWorker.register('sw.js').catch(()=>{});
+/* 自動更新：打開或切回 App 時檢查有沒有新版本，有新版就自動重新整理 */
+(function(){
+  if(!('serviceWorker' in navigator)||location.protocol!=='https:')return;
+  navigator.serviceWorker.register('sw.js').catch(()=>{});
+  let base=null,last=0,going=false;
+  async function sig(){const r=await fetch('./index.html',{cache:'no-store'});if(!r.ok)throw 0;const t=await r.text();let h=0;for(let i=0;i<t.length;i++)h=(h*31+t.charCodeAt(i))|0;return h;}
+  function busy(){const a=document.activeElement;return !$('#sheet').hidden||!$('#lb').hidden||(a&&/INPUT|TEXTAREA|SELECT/.test(a.tagName));}
+  async function check(){
+    if(going||!navigator.onLine||Date.now()-last<60000)return;last=Date.now();
+    try{
+      navigator.serviceWorker.getRegistration().then(r=>r&&r.update()).catch(()=>{});
+      const h=await sig();
+      if(base===null){base=h;return;}
+      if(h!==base&&!busy()){going=true;toast('有新版本，正在更新…');setTimeout(()=>location.reload(),900);}
+    }catch(e){}
+  }
+  setTimeout(check,3000);
+  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')check();});
+})();
 </script>
 </body>
 </html>
