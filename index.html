@@ -612,7 +612,8 @@ function syncDetail(){
   return syncLabel()+(t?`（最後同步 ${t.getHours()}:${String(t.getMinutes()).padStart(2,'0')}）`:'');
 }
 setInterval(()=>{if(SY.cfg&&document.visibilityState==='visible')syncNow();},20000);
-document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')syncNow();});
+setInterval(()=>{const a=document.activeElement;if(S.tab==='weather'&&document.visibilityState==='visible'&&$('#sheet').hidden&&!(a&&/INPUT|SELECT|TEXTAREA/.test(a.tagName)))refreshWx();},10*60*1000);
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'){syncNow();if(S.tab==='weather')refreshWx();}});
 addEventListener('online',()=>syncNow());
 addEventListener('offline',()=>{SY.status='offline';paintSync();});
 
@@ -965,14 +966,15 @@ function renderWeather(){
   if(WX.err)h+=`<div class="banner">${esc(WX.err)}</div>`;
   if(!c&&WX.loading)h+=`<div class="loading">查詢天氣中…</div>`;
   if(c){
-    const ago=Math.round((Date.now()-c.at)/60000);
-    h+=`<ul class="items card wx-list">`+c.days.map(d=>{const {lv,r}=dayRisk(d);const [y,m,dd]=d.date.split('-').map(Number);const wd=WK[new Date(y,m-1,dd).getDay()];
+    const ago=Math.round((Date.now()-c.at)/60000),ud=new Date(c.at),old=ago>360;
+    if(old&&!WX.loading)h+=`<div class="banner">這是 ${ud.getMonth()+1}/${ud.getDate()} 查到的舊預報，按「重新整理」抓最新的。</div>`;
+    h+=`<ul class="items card wx-list">`+c.days.filter(d=>d.date>=today()).map(d=>{const {lv,r}=dayRisk(d);const [y,m,dd]=d.date.split('-').map(Number);const wd=WK[new Date(y,m-1,dd).getDay()];
       return `<li class="wx-day ${TD.has(d.date)?'trip':''} l${lv}">
         <div class="wx-date"><b>${m}/${dd}</b><small>週${wd}</small></div>
         <div class="wx-main"><div class="wx-top"><span class="wx-code ${WCLS(d.code)}">${WCODE(d.code)}</span><span class="wx-t">${Math.round(d.tmin)}–${Math.round(d.tmax)}°C</span>${TD.has(d.date)?'<span class="tag must">出發</span>':''}</div>
         <div class="wx-nums"><span>降雨 ${d.pop}%</span><span>雨量 ${d.rain<1?'0':Math.round(d.rain)} mm</span><span>陣風 ${beaufort(d.gust)} 級</span></div>
         ${r.length?`<div class="wx-risk">${r.map(esc).join('・')}</div>`:''}</div></li>`;}).join('')+`</ul>
-      <p class="hint" style="margin:8px 4px 0">更新於 ${ago<1?'剛剛':ago+' 分鐘前'}。資料來源：Open-Meteo 預報模式。</p>`;
+      <p class="hint" style="margin:8px 4px 0">更新於 ${ud.getMonth()+1}/${ud.getDate()} ${ud.getHours()}:${String(ud.getMinutes()).padStart(2,'0')}（${ago<1?'剛剛':ago<60?ago+' 分鐘前':Math.round(ago/60)+' 小時前'}）。切回這頁時會自動更新。資料來源：Open-Meteo 預報模式。</p>`;
   }
   h+=wxLinks(p);
   if(can)h+=`<div class="cat-actions"><button class="btn ${S.confirm==='wxdel'?'danger':'ghost'}" data-act="wxDel">${S.confirm==='wxdel'?`確定刪除「${esc(p.name)}」？`:'刪除這個營地'}</button></div>`;
