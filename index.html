@@ -297,6 +297,10 @@ nav.tabs button[aria-selected="true"]{background:var(--sun);color:var(--on-sun);
 .wx-t{font-variant-numeric:tabular-nums;font-weight:700}
 .wx-nums{display:flex;gap:10px;flex-wrap:wrap;font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
 .wx-risk{font-size:12px;color:var(--heart);font-weight:700}
+.wx-half{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.wx-hl{font-size:12px;font-weight:700;color:var(--muted);width:30px;flex:none}
+.wx-half .wx-nums{width:100%;padding-left:38px}
+.wx-date .tag{justify-self:start;font-size:11px}
 .wx-day.l0 .wx-risk{color:var(--sky)}
 .wx-links{margin-top:22px;padding:16px;display:grid;gap:10px}
 .wx-links h3{margin:0;font-family:var(--f-display);font-weight:400;font-size:18px;display:flex;align-items:center;gap:8px}
@@ -875,58 +879,63 @@ function rangeText(t,withYear){const n=+t.nights||0;return n>0?`${fmtDate(t.date
 const blob=id=>isDrive(id)?`https://drive.google.com/thumbnail?id=${encodeURIComponent(id.slice(2))}&sz=w1600`:(URLS.get(id)||'');
 const hearts=n=>n?'♥'.repeat(n):'';
 
-/* ---------- 天氣（Open-Meteo，免費、不用帳號） ---------- */
-const WX={data:{},loading:false,err:'',search:null,searching:false};
+/* ---------- 天氣（中央氣象署鄉鎮預報，透過自己的 Google Apps Script 取得） ---------- */
+const WX={data:{},loading:false,err:'',errCode:''};
+const COUNTIES=['基隆市','臺北市','新北市','桃園市','新竹市','新竹縣','苗栗縣','臺中市','彰化縣','南投縣','雲林縣','嘉義市','嘉義縣','臺南市','高雄市','屏東縣','宜蘭縣','花蓮縣','臺東縣','澎湖縣','金門縣','連江縣'];
 function normWx(){S.wx=S.wx||{};S.wx.places=S.wx.places||[];if(!S.wx.days)S.wx.days=2;}
 const saveWx=()=>{if(S.db)S.db.doc('weather/main').set(clone(S.wx));};
-const WCODE=c=>c===0?'晴':c<=2?'晴時多雲':c===3?'陰天':c<=48?'有霧':c<=57?'毛毛雨':c<=63?'下雨':c<=67?'大雨':c<=77?'下雪':c<=81?'陣雨':c===82?'豪大陣雨':'雷雨';
-const WCLS=c=>c<=2?'sunny':c<=48?'overcast':c>=95?'storm':'rain';
-const BEAU=[1,6,12,20,29,39,50,62,75,89,103,118];
-const beaufort=k=>{let b=0;while(b<BEAU.length&&k>=BEAU[b])b++;return b;};
+const beauNum=v=>{const n=parseInt(String(v??'').replace(/[^\d]/g,''),10);return isNaN(n)?null:n;};
+const popNum=v=>{const n=parseInt(v,10);return isNaN(n)?null:n;};
+const numOr=v=>{const n=parseFloat(v);return isNaN(n)?null:n;};
+function toDays(periods){
+  const map=new Map();
+  for(const p of periods||[]){
+    const s=String(p.start||'');if(s.length<13)continue;
+    let date=s.slice(0,10);const hr=+s.slice(11,13);
+    const night=!(hr>=6&&hr<18);
+    if(hr<6){const [y,m,d]=date.split('-').map(Number);const t=new Date(y,m-1,d-1);date=`${t.getFullYear()}-${String(t.getMonth()+1).padStart(2,'0')}-${String(t.getDate()).padStart(2,'0')}`;}
+    const d=map.get(date)||{date};
+    d[night?'night':'day']={wx:p.wx,code:p.code,pop:popNum(p.pop),tmax:numOr(p.tmax??p.t),tmin:numOr(p.tmin??p.t),beau:beauNum(p.beau),desc:p.desc};
+    map.set(date,d);
+  }
+  return [...map.values()].sort((a,b)=>a.date.localeCompare(b.date)).map(d=>{
+    const ps=[d.day,d.night].filter(Boolean);
+    const nums=k=>ps.map(x=>x[k]).filter(v=>v!==null&&v!==undefined);
+    const pops=nums('pop'),bs=nums('beau'),mx=nums('tmax'),mn=nums('tmin');
+    return Object.assign(d,{wx:(d.day||d.night).wx,pop:pops.length?Math.max(...pops):null,beau:bs.length?Math.max(...bs):null,
+      tmax:mx.length?Math.max(...mx):null,tmin:mn.length?Math.min(...mn):null});
+  });
+}
 function dayRisk(d){
-  const r=[];let lv=0;
-  const g=d.gust,b=beaufort(g);
-  if(b>=8){r.push(`陣風 ${b} 級，帳篷天幕危險`);lv=2;}else if(b>=6){r.push(`陣風 ${b} 級，要加強營繩營釘`);lv=Math.max(lv,1);}
-  if(d.rain>=80){r.push(`雨量 ${Math.round(d.rain)} 毫米，豪雨`);lv=2;}else if(d.rain>=40){r.push(`雨量 ${Math.round(d.rain)} 毫米，大雨`);lv=Math.max(lv,1);}
-  else if(d.pop>=70){r.push('很可能下雨，帶雨具和地布');lv=Math.max(lv,1);}
-  if(d.code>=95){r.push('可能有雷雨');lv=Math.max(lv,1);}
-  if(d.tmin<=10){r.push(`最低 ${Math.round(d.tmin)}°C，帶暖爐和電熱毯`);}
+  const r=[];let lv=0;const w=[d.day&&d.day.wx,d.night&&d.night.wx].filter(Boolean).join('、');
+  if(/颱風|豪雨/.test(w)){r.push('可能有豪雨或颱風');lv=2;}
+  if(d.beau!==null&&d.beau>=7){r.push(`風力 ${d.beau} 級，帳篷天幕危險`);lv=2;}
+  else if(d.beau!==null&&d.beau>=5){r.push(`風力 ${d.beau} 級，要加強營繩營釘`);lv=Math.max(lv,1);}
+  if(lv<2&&/大雨/.test(w)){r.push('可能有大雨');lv=Math.max(lv,1);}
+  if(/雷/.test(w)){r.push('可能有雷雨');lv=Math.max(lv,1);}
+  if(d.pop!==null&&d.pop>=70&&!/大雨|豪雨/.test(w)){r.push('很可能下雨，帶雨具和地布');lv=Math.max(lv,1);}
+  if(d.tmin!==null&&d.tmin<=10)r.push(`最低 ${Math.round(d.tmin)}°C，帶暖爐和電熱毯`);
   return {lv,r};
 }
-async function geoSearch(q){
-  q=q.trim();
-  const m=q.match(/^\s*(-?\d+(?:\.\d+)?)\s*[,，\s]\s*(-?\d+(?:\.\d+)?)\s*$/);
-  if(m)return [{name:`座標 ${(+m[1]).toFixed(3)}, ${(+m[2]).toFixed(3)}`,lat:+m[1],lon:+m[2],sub:'自訂座標'}];
-  const tries=[q,q+'鄉',q+'鎮',q+'區',q+'市',q.replace(/[鄉鎮區市縣]$/,'')].filter((v,i,a)=>v.length>=2&&a.indexOf(v)===i);
-  const out=[],seen=new Set();
-  for(const t of tries){
-    try{const r=await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(t)}&count=8&language=zh&format=json`);
-      const j=await r.json();
-      for(const x of j.results||[]){const k=x.latitude.toFixed(2)+','+x.longitude.toFixed(2);if(seen.has(k))continue;seen.add(k);
-        out.push({name:x.name,lat:x.latitude,lon:x.longitude,sub:[x.admin1,x.admin2,x.country].filter(Boolean).join('・'),tw:x.country_code==='TW'});}}
-    catch(e){}
-    if(out.some(x=>x.tw))break;
-  }
-  return out.sort((a,b)=>(b.tw?1:0)-(a.tw?1:0)).slice(0,8);
-}
+const WXCLS=w=>/雷|颱風|豪雨|大雨/.test(w||'')?'storm':/雨/.test(w||'')?'rain':/晴/.test(w||'')?'sunny':'overcast';
+const WXERR={cwa_nokey:'還沒設定氣象署授權碼。',cwa_badkey:'氣象署授權碼不對，請重新貼上。',cwa_town:'找不到這個鄉鎮的預報，請重新設定營地。',cwa_county:'縣市名稱不對，請重新設定營地。',unknown_action:'Apps Script 還是舊版程式，請照教學更新並重新部署。'};
 async function loadForecast(p,force){
   const k=p.id;const c=WX.data[k];
   if(c&&!force&&Date.now()-c.at<30*60*1000)return c;
-  const url=`https://api.open-meteo.com/v1/forecast?latitude=${p.lat}&longitude=${p.lon}&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max,precipitation_sum,wind_gusts_10m_max,wind_speed_10m_max&timezone=Asia%2FTaipei&forecast_days=16&wind_speed_unit=kmh`;
-  const j=await (await fetch(url)).json();
-  if(!j.daily)throw new Error('no data');
-  const D=j.daily;
-  const days=D.time.map((t,i)=>({date:t,code:D.weather_code[i],tmax:D.temperature_2m_max[i],tmin:D.temperature_2m_min[i],pop:D.precipitation_probability_max[i]??0,rain:D.precipitation_sum[i]??0,gust:D.wind_gusts_10m_max[i]??0,wind:D.wind_speed_10m_max[i]??0}));
-  const v={at:Date.now(),days};WX.data[k]=v;
-  try{LDB.put('docs','meta/wx-'+k,v);}catch(e){}
+  const r=await api('wx',{county:p.county,town:p.town},30000);
+  const v={at:Date.now(),issued:r.at||Date.now(),geocode:r.geocode||'',days:toDays(r.periods)};
+  WX.data[k]=v;
+  try{LDB.put('docs','meta/wxc-'+k,v);}catch(e){}
   return v;
 }
 function wxPlace(){normWx();return S.wx.places.find(p=>p.id===S.wx.sel)||S.wx.places[0];}
 async function refreshWx(force){
-  const p=wxPlace();if(!p)return;
-  if(!WX.data[p.id]){try{const c=await LDB.get('docs','meta/wx-'+p.id);if(c)WX.data[p.id]=c;}catch(e){}}
-  WX.loading=true;WX.err='';if(S.tab==='weather')render();
-  try{await loadForecast(p,force);}catch(e){WX.err=navigator.onLine?'天氣資料暫時抓不到，稍後再試。':'沒有網路，顯示的是上次查到的天氣。';}
+  const p=wxPlace();if(!SY.cfg)return;
+  if(!p||!p.town){if(WX.keyOk===undefined){WX.keyOk=null;api('ping').then(r=>{WX.keyOk=!!r.cwa;if(!r.cwa){WX.errCode='cwa_nokey';if(S.tab==='weather')render();}}).catch(()=>{WX.keyOk=undefined;});}return;}
+  if(!WX.data[p.id]){try{const c=await LDB.get('docs','meta/wxc-'+p.id);if(c)WX.data[p.id]=c;}catch(e){}}
+  WX.loading=true;WX.err='';WX.errCode='';if(S.tab==='weather')render();
+  try{await loadForecast(p,force);}
+  catch(e){WX.errCode=e&&e.code||'';WX.err=WXERR[WX.errCode]||(navigator.onLine?'氣象署資料暫時抓不到，稍後再試。':'沒有網路，顯示的是上次查到的天氣。');}
   WX.loading=false;if(S.tab==='weather')render();
 }
 function tripDates(){
@@ -935,17 +944,42 @@ function tripDates(){
   for(let i=0;i<=(+S.wx.days||0);i++){const t=new Date(y,m-1,dd+i);out.add(`${t.getFullYear()}-${String(t.getMonth()+1).padStart(2,'0')}-${String(t.getDate()).padStart(2,'0')}`);}
   return out;
 }
+const tRange=x=>x.tmin===null||x.tmax===null?'':(Math.round(x.tmin)===Math.round(x.tmax)?`${Math.round(x.tmin)}°C`:`${Math.round(x.tmin)}–${Math.round(x.tmax)}°C`);
+function wxHalf(lbl,x){
+  if(!x)return '';
+  return `<div class="wx-half"><span class="wx-hl">${lbl}</span><span class="wx-code ${WXCLS(x.wx)}">${esc(x.wx||'—')}</span><span class="wx-t">${tRange(x)}</span>
+    <span class="wx-nums"><span>降雨 ${x.pop===null?'—':x.pop+'%'}</span><span>風 ${x.beau===null?'—':x.beau+' 級'}</span></span></div>`;
+}
+function keyCard(){
+  return `<section class="card wx-trip"><h3 style="margin:0;font-family:var(--f-display);font-weight:400;font-size:18px">設定氣象署授權碼</h3>
+    <p class="hint" style="margin:0">到中央氣象署「氣象資料開放平臺」免費註冊會員，登入後在「取得授權碼」頁面複製授權碼（CWA- 開頭），貼在下面。只要設定一次，全家的手機都能用。</p>
+    <a class="btn" href="https://opendata.cwa.gov.tw/user/authkey" target="_blank" rel="noopener" style="justify-self:start">打開氣象資料開放平臺</a>
+    <div class="field"><label for="wx-key">授權碼</label><input id="wx-key" placeholder="CWA-XXXXXXXX-XXXX-…" autocomplete="off" autocapitalize="characters"></div>
+    ${WX.keyErr?`<div class="banner">${esc(WX.keyErr)}</div>`:''}
+    <button class="btn sun" data-act="wxKeySave" ${WX.keyBusy?'disabled':''} style="justify-self:start">${WX.keyBusy?'確認中…':'儲存授權碼'}</button></section>`;
+}
 function renderWeather(){
   normWx();
-  $('#ttl').innerHTML=BR+'營地天氣<small>出發前看雨量、風力和溫度</small>';
+  $('#ttl').innerHTML=BR+'營地天氣<small>中央氣象署鄉鎮預報</small>';
   $('#hdrBtn').innerHTML='';
   const P=S.wx.places,p=wxPlace(),can=S.canWrite&&!S.noDb;
+  if(!SY.cfg){
+    $('#view').innerHTML=`<div class="card empty"><svg class="wide" aria-hidden="true"><use href="#campScene"/></svg><p>天氣要先開啟家人同步</p><p>天氣是透過你的 Google 同步程式向中央氣象署查詢。到「紀錄」最下面按「開啟同步」，設定好再回來。</p></div>`+wxLinks(null);
+    return;
+  }
   let h=`<div class="wx-places">${P.map(x=>`<button class="wx-place ${p&&x.id===p.id?'on':''}" data-act="wxSel" data-id="${x.id}">${esc(x.name)}</button>`).join('')}
     <button class="wx-place add" data-act="wxAdd">＋ 新增營地</button></div>`;
+  if(WX.errCode==='cwa_nokey'||WX.errCode==='cwa_badkey'){h+=keyCard()+wxLinks(null);$('#view').innerHTML=h;return;}
   if(!p){
-    h+=`<div class="card empty"><svg class="wide" aria-hidden="true"><use href="#campScene"/></svg><p>先新增要去的營地</p><p>輸入鄉鎮名稱，例如「南庄」「尖石」「仁愛」，就能查到未來 16 天的天氣。</p>
+    h+=`<div class="card empty"><svg class="wide" aria-hidden="true"><use href="#campScene"/></svg><p>先新增要去的營地</p><p>選營地所在的縣市和鄉鎮，就能看到中央氣象署未來一週的預報。</p>
       <button class="btn sun" data-act="wxAdd">＋ 新增營地</button></div>`;
     h+=wxLinks(null);$('#view').innerHTML=h;return;
+  }
+  if(!p.town){
+    h+=`<div class="card empty"><p>「${esc(p.name)}」是舊版設定的營地</p><p>現在改用中央氣象署的鄉鎮預報，請重新選一次縣市和鄉鎮。</p>
+      <button class="btn sun" data-act="wxAdd" data-redo="${p.id}">重新選擇鄉鎮</button></div>`;
+    if(can)h+=`<div class="cat-actions"><button class="btn ${S.confirm==='wxdel'?'danger':'ghost'}" data-act="wxDel">${S.confirm==='wxdel'?`確定刪除「${esc(p.name)}」？`:'刪除這個營地'}</button></div>`;
+    $('#view').innerHTML=h;return;
   }
   const c=WX.data[p.id];const TD=tripDates();
   h+=`<section class="card wx-trip">
@@ -953,54 +987,62 @@ function renderWeather(){
     <div class="field"><label for="wx-days">住幾晚</label><select id="wx-days">${[0,1,2,3,4,5].map(n=>`<option value="${n}" ${+S.wx.days===n?'selected':''}>${n?n+' 晚':'當日來回'}</option>`).join('')}</select></div></div>`;
   if(c&&TD.size){
     const ds=c.days.filter(d=>TD.has(d.date));
-    if(!ds.length)h+=`<p class="hint">出發日期超過 16 天，還查不到預報。出發前一週再來看。</p>`;
+    if(!ds.length)h+=`<p class="hint">氣象署的鄉鎮預報只到未來 7 天，出發前一週再來看。</p>`;
     else{
       const lv=Math.max(...ds.map(d=>dayRisk(d).lv));
-      const far=ds.some(d=>(new Date(d.date)-Date.now())/864e5>7);
+      const part=ds.length<TD.size?'（還有幾天超過預報範圍，之後再確認）':'';
       h+=`<div class="verdict v${lv}"><b>${['適合出發','要注意天氣','不建議出發'][lv]}</b>
-        <span>${lv===2?'有強風或豪雨，建議改期。':lv===1?'可以去，但要做好防風防雨。':'預報看起來不錯！'}${far?'（超過 7 天的預報變化大，出發前再確認）':''}</span></div>`;
+        <span>${lv===2?'有強風、豪雨或颱風，建議改期。':lv===1?'可以去，但要做好防風防雨。':'預報看起來不錯！'}${part}</span></div>`;
     }
   }else if(!S.wx.date)h+=`<p class="hint">填出發日期，就會幫你判斷那幾天適不適合去。</p>`;
   h+=`</section>`;
-  h+=`<div class="wx-head"><span>${esc(p.name)}・未來 16 天</span><button class="btn" data-act="wxRefresh" ${WX.loading?'disabled':''}>${WX.loading?'更新中…':'重新整理'}</button></div>`;
+  h+=`<div class="wx-head"><span>${esc(p.county)}${esc(p.town)}・未來一週</span><button class="btn" data-act="wxRefresh" ${WX.loading?'disabled':''}>${WX.loading?'更新中…':'重新整理'}</button></div>`;
   if(WX.err)h+=`<div class="banner">${esc(WX.err)}</div>`;
-  if(!c&&WX.loading)h+=`<div class="loading">查詢天氣中…</div>`;
+  if(!c&&WX.loading)h+=`<div class="loading">查詢氣象署預報中…</div>`;
   if(c){
     const ago=Math.round((Date.now()-c.at)/60000),ud=new Date(c.at),old=ago>360;
     if(old&&!WX.loading)h+=`<div class="banner">這是 ${ud.getMonth()+1}/${ud.getDate()} 查到的舊預報，按「重新整理」抓最新的。</div>`;
     h+=`<ul class="items card wx-list">`+c.days.filter(d=>d.date>=today()).map(d=>{const {lv,r}=dayRisk(d);const [y,m,dd]=d.date.split('-').map(Number);const wd=WK[new Date(y,m-1,dd).getDay()];
       return `<li class="wx-day ${TD.has(d.date)?'trip':''} l${lv}">
-        <div class="wx-date"><b>${m}/${dd}</b><small>週${wd}</small></div>
-        <div class="wx-main"><div class="wx-top"><span class="wx-code ${WCLS(d.code)}">${WCODE(d.code)}</span><span class="wx-t">${Math.round(d.tmin)}–${Math.round(d.tmax)}°C</span>${TD.has(d.date)?'<span class="tag must">出發</span>':''}</div>
-        <div class="wx-nums"><span>降雨 ${d.pop}%</span><span>雨量 ${d.rain<1?'0':Math.round(d.rain)} mm</span><span>陣風 ${beaufort(d.gust)} 級</span></div>
+        <div class="wx-date"><b>${m}/${dd}</b><small>週${wd}</small>${TD.has(d.date)?'<span class="tag must" style="margin-top:4px">出發</span>':''}</div>
+        <div class="wx-main">${wxHalf('白天',d.day)}${wxHalf('晚上',d.night)}
         ${r.length?`<div class="wx-risk">${r.map(esc).join('・')}</div>`:''}</div></li>`;}).join('')+`</ul>
-      <p class="hint" style="margin:8px 4px 0">更新於 ${ud.getMonth()+1}/${ud.getDate()} ${ud.getHours()}:${String(ud.getMinutes()).padStart(2,'0')}（${ago<1?'剛剛':ago<60?ago+' 分鐘前':Math.round(ago/60)+' 小時前'}）。切回這頁時會自動更新。資料來源：Open-Meteo 預報模式。</p>`;
+      <p class="hint" style="margin:8px 4px 0">更新於 ${ud.getMonth()+1}/${ud.getDate()} ${ud.getHours()}:${String(ud.getMinutes()).padStart(2,'0')}（${ago<1?'剛剛':ago<60?ago+' 分鐘前':Math.round(ago/60)+' 小時前'}）。切回這頁時會自動更新。資料來源：中央氣象署鄉鎮天氣預報（一天發布 4 次）。降雨機率只提供 3 天內。</p>`;
   }
-  h+=wxLinks(p);
+  h+=wxLinks(p,c);
   if(can)h+=`<div class="cat-actions"><button class="btn ${S.confirm==='wxdel'?'danger':'ghost'}" data-act="wxDel">${S.confirm==='wxdel'?`確定刪除「${esc(p.name)}」？`:'刪除這個營地'}</button></div>`;
   $('#view').innerHTML=h;
 }
-function wxLinks(p){
+function wxLinks(p,c){
+  const tid=c&&c.geocode?String(c.geocode).slice(0,7):'';
   return `<section class="card wx-links"><h3>${catIcon('行前',4)}颱風和官方預報</h3>
     <p>颱風動態、警報和停班停課，以中央氣象署為準。</p>
     <div class="tools">
       <a class="btn sun" href="https://www.cwa.gov.tw/V8/C/P/Typhoon/TY_NEWS.html" target="_blank" rel="noopener">颱風消息</a>
-      <a class="btn" href="https://www.cwa.gov.tw/V8/C/W/County/index.html" target="_blank" rel="noopener">縣市天氣預報</a>
-      ${p?`<a class="btn" href="https://www.windy.com/${p.lat.toFixed(3)}/${p.lon.toFixed(3)}?${p.lat.toFixed(3)},${p.lon.toFixed(3)},10" target="_blank" rel="noopener">風雨動畫（Windy）</a>`:''}
+      ${tid?`<a class="btn" href="https://www.cwa.gov.tw/V8/C/W/Town/Town.html?TID=${encodeURIComponent(tid)}" target="_blank" rel="noopener">氣象署${esc(p.town)}頁面</a>`
+        :`<a class="btn" href="https://www.cwa.gov.tw/V8/C/W/County/index.html" target="_blank" rel="noopener">縣市天氣預報</a>`}
     </div></section>`;
 }
 function renderWxSheet(el){
   const f=sheetState;
-  el.innerHTML=`<div class="sheet-bar"><button class="btn ghost" data-act="close">取消</button><h3>新增營地</h3><span style="width:64px"></span></div>
+  el.innerHTML=`<div class="sheet-bar"><button class="btn ghost" data-act="close">取消</button><h3>${f.redo?'重新選擇鄉鎮':'新增營地'}</h3><span style="width:64px"></span></div>
   <form class="sheet-body" autocomplete="off" onsubmit="return false">
-    <div class="field"><label for="wx-q">營地在哪裡</label><input id="wx-q" value="${esc(f.q||'')}" placeholder="例如：南庄、尖石、仁愛" data-enter="wxSearch"></div>
-    <button type="button" class="btn sun" data-act="wxSearch" ${f.busy?'disabled':''}>${f.busy?'搜尋中…':'搜尋'}</button>
-    ${f.res?(f.res.length?`<ul class="items card">${f.res.map((r,i)=>`<li class="item tap" data-act="wxPick" data-k="${i}"><span class="nmw"><span class="nm">${esc(r.name)}</span><span class="nt">${esc(r.sub||'')}</span></span><span class="tag off">選這個</span></li>`).join('')}</ul>`
-      :`<div class="banner">找不到「${esc(f.q)}」。試試換成鄉鎮名稱（例如「南庄」改「南庄鄉」），或用英文拼音（Nanzhuang）。也可以在 Google 地圖長按營地，複製座標貼進來，例如 24.597, 121.002。</div>`):''}
-    ${f.pick?`<div class="field"><label for="wx-name">營地名稱（顯示用）</label><input id="wx-name" value="${esc(f.pick.name)}"></div>
-      <button type="button" class="btn sun newtrip" data-act="wxSave">儲存這個營地</button>`:''}
-    <p class="hint">在 Google 地圖長按營地位置，上方會出現座標（例如 24.597, 121.002），複製貼到上面搜尋，位置最準。</p>
+    <div class="field"><label for="wx-county">縣市</label><select id="wx-county"><option value="">請選擇縣市</option>${COUNTIES.map(c=>`<option ${f.county===c?'selected':''}>${c}</option>`).join('')}</select></div>
+    <div class="field"><label for="wx-town">鄉鎮市區</label>
+      ${f.busy?'<div class="hint">讀取鄉鎮中…</div>':f.towns?`<select id="wx-town"><option value="">請選擇鄉鎮</option>${f.towns.map(t=>`<option ${f.town===t?'selected':''}>${esc(t)}</option>`).join('')}</select>`:'<div class="hint">先選縣市</div>'}</div>
+    ${f.err?`<div class="banner">${esc(f.err)}</div>`:''}
+    <div class="field"><label for="wx-name">營地名稱（顯示用）</label><input id="wx-name" value="${esc(f.name||'')}" placeholder="例如：森日快樂露營區"></div>
+    <button type="button" class="btn sun newtrip" data-act="wxSave">儲存這個營地</button>
+    <p class="hint">預報以鄉鎮公所的位置為準。營地在山上的話，實際溫度通常會再低一些。</p>
   </form>`;
+}
+async function wxLoadTowns(county){
+  const f=sheetState;f.county=county;f.towns=null;f.town='';f.err='';
+  if(!county){refreshSheet();return;}
+  f.busy=true;refreshSheet();
+  try{const r=await api('wxtowns',{county},30000);if(sheetState===f)f.towns=r.towns;}
+  catch(e){if(sheetState===f){f.err=WXERR[e&&e.code]||'讀不到鄉鎮清單，請確認網路後再試。';if(e&&(e.code==='cwa_nokey'||e.code==='cwa_badkey')){WX.errCode=e.code;}}}
+  if(sheetState===f){f.busy=false;refreshSheet();}
 }
 
 function renderTrips(){
@@ -1219,7 +1261,7 @@ document.addEventListener('click',async e=>{
     case 'newTrip':{const d=new Date();
       openSheet({kind:'form',form:{id:null,date:`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`,nights:1,place:'',area:'',site:'',weather:'',notes:'',forgot:'',rating:0,photos:[],added:[],removed:[],uploading:0}});break;}
     case 'openTrip': S.confirm=null;openSheet({kind:'detail',id:b.dataset.id});break;
-    case 'close': closeSheet();break;
+    case 'close': closeSheet();if(S.tab==='weather')render();break;
     case 'editTrip':{const t=S.trips.find(x=>x.id===sheetState.id);
       openSheet({kind:'form',back:t.id,form:{id:t.id,date:t.date||'',nights:+t.nights||0,place:t.place||'',area:t.area||'',site:t.site||'',weather:t.weather||'',notes:t.notes||'',forgot:t.forgot||'',rating:t.rating||0,photos:[...(t.photos||[])],added:[],removed:[],uploading:0}});break;}
     case 'cancelForm':{const f=sheetState.form;
@@ -1243,11 +1285,18 @@ document.addEventListener('click',async e=>{
     case 'restore': $('#restorepick').click();break;
     case 'doRestore': doRestore(sheetState.data).catch(()=>toast('還原失敗，請再試一次'));break;
     case 'wxSel': S.wx.sel=b.dataset.id;saveWx();render();refreshWx();break;
-    case 'wxAdd': openSheet({kind:'wxadd'});setTimeout(()=>{const q=$('#wx-q');q&&q.focus();},80);break;
-    case 'wxSearch': wxSearch();break;
-    case 'wxPick': sheetState.pick=clone(sheetState.res[+b.dataset.k]);refreshSheet();break;
-    case 'wxSave':{const p=sheetState.pick;const nm=($('#wx-name').value||p.name).trim();normWx();
-      const id=newId();S.wx.places.push({id,name:nm,lat:+p.lat.toFixed(4),lon:+p.lon.toFixed(4)});S.wx.sel=id;saveWx();closeSheet();render();refreshWx(true);break;}
+    case 'wxAdd':{const redo=b.dataset.redo;const op=redo&&S.wx.places.find(x=>x.id===redo);openSheet({kind:'wxadd',redo:redo||null,name:op?op.name:''});break;}
+    case 'wxSave':{const f=sheetState;const county=$('#wx-county').value;const t=$('#wx-town');const town=t?t.value:'';
+      if(!county||!town){toast('請選擇縣市和鄉鎮');return;}
+      const nm=($('#wx-name').value||'').trim()||town;normWx();
+      if(f.redo){const x=S.wx.places.find(x=>x.id===f.redo);if(x){x.name=nm;x.county=county;x.town=town;delete x.lat;delete x.lon;delete WX.data[x.id];}}
+      else{const id=newId();S.wx.places.push({id,name:nm,county,town});S.wx.sel=id;}
+      saveWx();closeSheet();render();refreshWx(true);break;}
+    case 'wxKeySave':{const k=($('#wx-key').value||'').trim();if(!k){toast('請貼上授權碼');return;}
+      WX.keyBusy=true;WX.keyErr='';render();
+      try{await api('cwakey',{cwakey:k},40000);WX.errCode='';WX.err='';WX.keyOk=true;toast('授權碼設定好了');refreshWx(true);}
+      catch(e){WX.keyErr=e&&e.code==='cwa_badkey'?'授權碼不對，請確認是 CWA- 開頭的那一串，整串複製。':e&&e.code==='unknown_action'?WXERR.unknown_action:'連不到氣象署，請稍後再試。';}
+      WX.keyBusy=false;render();break;}
     case 'wxRefresh': refreshWx(true);break;
     case 'wxDel':
       if(S.confirm!=='wxdel'){setConfirm('wxdel');render();return;}
@@ -1298,12 +1347,14 @@ document.addEventListener('change',e=>{
   const el=e.target, a=el.dataset.act;
   if(a==='renameItem'||a==='noteItem'){const li=el.closest('[data-i]');const {i}=findItem(li.dataset.c,li.dataset.i);if(!i)return;const v=el.value.trim();
     if(a==='renameItem'){if(v&&v!==i.name){i.name=v;saveGear();}}else if(v!==(i.note||'')){if(v)i.note=v;else delete i.note;saveGear();}}
+  if(el.id==='wx-county'){wxLoadTowns(el.value);return;}
+  if(el.id==='wx-town'){const f=sheetState;f.town=el.value;const n=$('#wx-name');if(n&&!n.value.trim())n.value=el.value;f.name=n?n.value:'';return;}
   if(el.id==='wx-date'||el.id==='wx-days'){normWx();if(el.id==='wx-date')S.wx.date=el.value;else S.wx.days=+el.value;saveWx();render();return;}
   if(a==='renameCat'){const c=S.gear.categories.find(c=>c.id===el.closest('[data-c]').dataset.c);const v=el.value.trim();if(c&&v&&v!==c.name){c.name=v;saveGear();}}
 });
 document.addEventListener('keydown',e=>{
   if(e.key==='Enter'&&e.target.dataset&&e.target.dataset.enter){e.preventDefault();const cat=e.target.closest('[data-c]');
-    const en=e.target.dataset.enter;en==='wxSearch'?wxSearch():en==='addItem'?addItem(cat.dataset.c):en==='addExtra'?addExtra():addCat();}
+    const en=e.target.dataset.enter;en==='addItem'?addItem(cat.dataset.c):en==='addExtra'?addExtra():addCat();}
   if(e.key==='Escape'&&!$('#lb').hidden)$('#lb').hidden=true;
 });
 function addItem(cid){const inp=$('#add-'+cid);const v=inp.value.trim();if(!v)return;
@@ -1312,10 +1363,6 @@ function addItem(cid){const inp=$('#add-'+cid);const v=inp.value.trim();if(!v)re
 function readMeal(){const m=sheetState.m;const d=$('#m-day');if(d)m.day=+d.value;const di=$('#m-dish');if(di)m.dish=di.value;const ig=$('#m-ings');if(ig)m.ings=[...new Set(splitIngs(ig.value))];}
 function addExtra(){const inp=$('#add-extra');const v=inp.value.trim();if(!v)return;
   if(!S.menu.extras.some(x=>x.name===v))S.menu.extras.push({id:uid(),name:v});render();saveMenu();const n=$('#add-extra');n&&n.focus();}
-async function wxSearch(){const f=sheetState;f.q=$('#wx-q').value.trim();if(f.q.length<2){toast('請輸入至少兩個字');return;}
-  f.busy=true;f.pick=null;refreshSheet();
-  try{f.res=await geoSearch(f.q);}catch(e){f.res=[];}
-  f.busy=false;if(f.res.length===1)f.pick=clone(f.res[0]);refreshSheet();}
 function addCat(){const inp=$('#newcat');const v=inp.value.trim();if(!v)return;
   S.gear.categories.push({id:uid(),name:v,items:[]});render();saveGear();}
 
